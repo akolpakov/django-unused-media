@@ -44,9 +44,10 @@ TODO
 Tests
 =====
 
-TODO
+All functionality covered by unit tests. To run tests::
+    python setup.py test
 
 License
 =======
 
-[MIT License](https://github.com/akolpakov/django-unused-media/blob/master/LICENSE)
+`MIT License <https://github.com/akolpakov/django-unused-media/blob/master/LICENSE/>`_.
