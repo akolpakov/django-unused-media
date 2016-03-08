@@ -1,56 +1,71 @@
-import os
-from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+# This file is part of django-unused-media.
+# https://github.com/akolpakov/django-unused-media
 
-def read(name):
-    return open(os.path.join(os.path.dirname(__file__), name)).read()
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/MIT-license
+# Copyright (c) 2015, Andrey Kolpakov <aakolpakov@gmail.com>
 
+from setuptools import setup
 
-class DjangoTests(TestCommand):
+try:
+    from pypandoc import convert
+    read_md = lambda f: convert(f, 'rst')
+except ImportError:
+    print("warning: pypandoc module not found, could not convert Markdown to RST")
+    read_md = lambda f: open(f, 'r').read()
 
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        from django.core import management
-        if 'DJANGO_SETTINGS_MODULE' not in os.environ:
-            os.environ['DJANGO_SETTINGS_MODULE'] = 'django_unused_media.tests.settings'
-        management.execute_from_command_line()
+tests_require = [
+    'nose',
+    'coverage',
+    'yanc',
+    'preggy',
+    'tox',
+    'ipdb',
+    'coveralls',
+    'sphinx',
+    'django_nose',
+    'httmock',
+    'pypandoc',
+]
 
 setup(
-    name = 'django-unused-media',
-    version = '0.0.1',
-    author = 'Andrey Kolpakov',
-    author_email = 'aakolpakov@gmail.com',
-    description = 'Remove unused media files',
-
-    license = 'MIT License',
-    keywords = 'django unused media cleanup obsolete',
-    url = 'https://github.com/akolpakov/django-unused-media',
-    packages=find_packages(),
-    long_description=read('README.rst'),
-
-    cmdclass={'test': DjangoTests},
-
-    install_requires=[
-        'Django >= 1.4.3',
-    ],
+    name='django-unused-media',
+    version='0.1.0',
+    description='Delete unused media files from Django project',
+    long_description=read_md('README.md'),
+    keywords='python django unused media remove delete',
+    author='Andrey Kolpakov',
+    author_email='aakolpakov@gmail.com',
+    url='https://github.com/akolpakov/django-unused-media',
+    license='MIT',
     classifiers=[
-        'Development Status :: 1 - Planning',
-        'Environment :: Web Environment',
-        'Framework :: Django',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Operating System :: Unix',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries'
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Utilities'
     ],
+    packages=['django_unused_media'],
+    include_package_data=True,
+    install_requires=[
+        # add your dependencies here
+        # remember to use 'package-name>=x.y.z,<x.y+1.0' notation (this way you get bugfixes)
+        'django>=1.6,<1.9',
+    ],
+    extras_require={
+        'tests': tests_require,
+    },
+    entry_points={
+        'console_scripts': [
+            # add cli scripts here in this form:
+            # 'django-unused-media=django-unused-media.cli:main',
+        ],
+    },
 )

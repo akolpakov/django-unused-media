@@ -1,0 +1,21 @@
+# This file is part of django-unused-media.
+# https://github.com/akolpakov/django-unused-media
+
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/MIT-license
+# Copyright (c) 2015, Andrey Kolpakov <aakolpakov@gmail.com>
+
+language: python
+
+python:
+    - "2.7"
+    - "3.4"
+    - "pypy"
+
+install:
+    # install python requirements
+    - make setup
+
+script:
+    # run tests
+    - make test
