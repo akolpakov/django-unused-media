@@ -1,7 +1,19 @@
 from django.db import models
 
 
-class FieldsTestModel(models.Model):
-    file_field = models.FileField(upload_to='test')
-    image_field = models.ImageField(upload_to='test_image')
+# Custom field
+
+class CustomFiled(models.FileField):
+    pass
+
+
+# Test models
+
+class FileFieldsModel(models.Model):
+    file_field = models.FileField(upload_to='test1')
+    image_field = models.ImageField(upload_to='test1_image')
+    char_field = models.CharField(max_length=255)
+
+class CustomFileldsModel(models.Model):
+    custom_field = CustomFiled(upload_to='test2', null=True, blank=True)
     char_field = models.CharField(max_length=255)

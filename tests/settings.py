@@ -10,6 +10,7 @@ DATABASES = {
 
 INSTALLED_APPS = (
     'django_unused_media',
+    'tests',
 )
 
 SECRET_KEY = 'test'

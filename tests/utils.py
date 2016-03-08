@@ -1,14 +1,5 @@
-try:
-    from cStringIO import cStringIO as BytesIO
-except ImportError:
-    from django.utils.six import BytesIO
-
-try:
-    from PIL import Image
-except ImportError:
-    import Image
-
 from django.core.files.base import ContentFile
+from django.conf import settings
 
 
 def create_file(filename, data=None):
@@ -17,8 +8,7 @@ def create_file(filename, data=None):
     return ContentFile(data, filename)
 
 
-def create_image(filename, size=(800, 600), image_mode='RGB', image_format='JPEG'):
-    data = BytesIO()
-    Image.new(image_mode, size).save(data, image_format)
-    data.seek(0)
-    return create_file(filename, data.read())
+def create_image(filename):
+    with open('%s/sample.jpg' % settings.TEST_DIR, 'r') as f:
+        image = create_file(filename, f.read())
+    return image
