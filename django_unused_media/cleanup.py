@@ -34,25 +34,40 @@ def get_used_media():
         }
 
         for t in f.model.objects.values(f.name).exclude(**is_empty).exclude(**is_null):
-            media.append(os.path.join(settings.MEDIA_ROOT, t.get(f.name)))
+            media.append(t.get(f.name))
 
     return media
 
 def _get_all_media():
     """
-        Get media which are not used in models
+        Get all media from MEDIA_ROOT
     """
 
     media = []
 
     for root, dirs, files in os.walk(settings.MEDIA_ROOT):
         for name in files:
-            media.append(os.path.join(root, name))
+            media.append(os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT))
 
     return media
 
 def get_unused_media():
+    """
+        Get media which are not used in models
+    """
+
     all_media = _get_all_media()
     used_media = get_used_media()
 
     return [t for t in all_media if t not in used_media]
+
+
+def _remove_media(files):
+    """
+        Delete file from media dir
+    """
+    for f in files:
+        os.remove(os.path.join(settings.MEDIA_ROOT, f))
+
+def remove_unused_media():
+    _remove_media(get_unused_media())
