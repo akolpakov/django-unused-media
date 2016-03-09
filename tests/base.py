@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import shutil
 import os
 from django.test import TestCase

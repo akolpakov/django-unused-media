@@ -18,6 +18,7 @@ except ImportError:
     read_md = lambda f: open(f, 'r').read()
 
 tests_require = [
+    'mock',
     'nose',
     'coverage',
     'yanc',

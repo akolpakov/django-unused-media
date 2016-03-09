@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.db import models
 from django.conf import settings
 
@@ -17,6 +19,7 @@ def _get_file_fields():
                 fields.append(f)
 
     return fields
+
 
 def get_used_media():
     """
@@ -38,6 +41,7 @@ def get_used_media():
 
     return media
 
+
 def _get_all_media():
     """
         Get all media from MEDIA_ROOT
@@ -50,6 +54,7 @@ def _get_all_media():
             media.append(os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT))
 
     return media
+
 
 def get_unused_media():
     """
@@ -69,5 +74,9 @@ def _remove_media(files):
     for f in files:
         os.remove(os.path.join(settings.MEDIA_ROOT, f))
 
+
 def remove_unused_media():
+    """
+        Remove unused media
+    """
     _remove_media(get_unused_media())

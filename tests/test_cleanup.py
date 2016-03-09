@@ -1,7 +1,12 @@
+# -*- coding: utf-8 -*-
+
+import mock
 from preggy import expect
 from django.db import models
+from django.core.management import call_command
 
 from django_unused_media.cleanup import _get_file_fields, _get_all_media, get_used_media, get_unused_media, _remove_media, remove_unused_media
+from django_unused_media.management.commands.cleanup_unused_media import Command
 from .base import BaseTestCase
 from .models import FileFieldsModel, CustomFileldsModel
 from .utils import create_file, create_image, create_file_and_write, exists_media_path
@@ -105,3 +110,46 @@ class UtilsTestCase(BaseTestCase):
         expect(get_unused_media()).Not.to_be_empty()
         remove_unused_media()
         expect(get_unused_media()).to_be_empty()
+
+    def test_command_call(self):
+        expect(call_command('cleanup_unused_media', interactive=False)).Not.to_be_an_error()
+
+    def test_command_not_interactive(self):
+        expect(exists_media_path('file.txt')).to_be_false()
+        create_file_and_write('file.txt')
+        expect(exists_media_path('file.txt')).to_be_true()
+
+        cmd = Command()
+        cmd.handle(interactive=False)
+        expect(cmd.stdout.getvalue().split('\n'))\
+            .to_include('Remove file.txt')\
+            .to_include('Done. 1 unused files have been removed')
+
+        expect(exists_media_path('file.txt')).to_be_false()
+
+    def test_command_interactive_n(self):
+        expect(exists_media_path('file.txt')).to_be_false()
+        create_file_and_write('file.txt')
+        expect(exists_media_path('file.txt')).to_be_true()
+
+        with mock.patch('__builtin__.raw_input', return_value='n'):
+            cmd = Command()
+            cmd.handle(interactive=True)
+            expect(cmd.stdout.getvalue().split('\n'))\
+                .to_include('Interrupted by user. Exit.')
+
+        expect(exists_media_path('file.txt')).to_be_true()
+
+    def test_command_interactive_y(self):
+        expect(exists_media_path('file.txt')).to_be_false()
+        create_file_and_write('file.txt')
+        expect(exists_media_path('file.txt')).to_be_true()
+
+        with mock.patch('__builtin__.raw_input', return_value='Y'):
+            cmd = Command()
+            cmd.handle(interactive=True)
+            expect(cmd.stdout.getvalue().split('\n'))\
+                .to_include('Remove file.txt')\
+                .to_include('Done. 1 unused files have been removed')
+
+        expect(exists_media_path('file.txt')).to_be_false()

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.core.files.base import ContentFile
 from django.conf import settings
 
