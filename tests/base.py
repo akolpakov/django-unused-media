@@ -5,11 +5,11 @@ from django.conf import settings
 
 
 class BaseTestCase(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        if not os.path.exists(settings.MEDIA_ROOT):
-            os.makedirs(settings.MEDIA_ROOT)
+    def setUp(self):
+        if os.path.exists(settings.MEDIA_ROOT):
+            shutil.rmtree(settings.MEDIA_ROOT)
 
-    @classmethod
-    def tearDownClass(cls):
+        os.makedirs(settings.MEDIA_ROOT)
+
+    def tearDown(self):
         shutil.rmtree(settings.MEDIA_ROOT)

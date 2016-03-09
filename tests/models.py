@@ -15,5 +15,5 @@ class FileFieldsModel(models.Model):
     char_field = models.CharField(max_length=255)
 
 class CustomFileldsModel(models.Model):
-    custom_field = CustomFiled(upload_to='test2', null=True, blank=True)
+    custom_field = CustomFiled(upload_to='sub/dir/test2', null=True, blank=True)
     char_field = models.CharField(max_length=255)
