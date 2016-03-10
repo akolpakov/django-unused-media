@@ -86,6 +86,24 @@ class UtilsTestCase(BaseTestCase):
             .to_include(self.model3.custom_field.name)\
             .to_include('file.txt')
 
+    def test_get_all_media_with_exclude(self):
+        create_file_and_write('file.txt')
+        create_file_and_write('.file2.txt')
+        create_file_and_write('test.txt')
+        create_file_and_write('one.png')
+        create_file_and_write('two.png')
+        create_file_and_write('three.png')
+        expect(_get_all_media(['.*', '*.png', 'test.txt']))\
+            .to_be_instance_of(list).to_length(6)\
+            .to_include(self.model1.file_field.name)\
+            .to_include(self.model1.image_field.name)\
+            .to_include(self.model2.file_field.name)\
+            .to_include(self.model2.image_field.name)\
+            .to_include(self.model3.custom_field.name)\
+            .to_include('file.txt')\
+            .Not.to_include('.file2.txt')\
+            .Not.to_include('test.txt')
+
     def test_get_unused_media_empty(self):
         expect(get_unused_media()).to_be_empty()
 
@@ -132,7 +150,7 @@ class UtilsTestCase(BaseTestCase):
         cmd = Command()
         cmd.handle(interactive=False)
         expect(cmd.stdout.getvalue().split('\n'))\
-            .to_include('Nothing to remove. Exit')
+            .to_include('Nothing to delete. Exit')
 
     def test_command_not_interactive(self):
         create_file_and_write('file.txt')

@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 
 import os
+import re
 
 
 def _get_file_fields():
@@ -42,7 +43,7 @@ def get_used_media():
     return media
 
 
-def _get_all_media():
+def _get_all_media(exclude=[]):
     """
         Get all media from MEDIA_ROOT
     """
@@ -51,17 +52,24 @@ def _get_all_media():
 
     for root, dirs, files in os.walk(settings.MEDIA_ROOT):
         for name in files:
-            media.append(os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT))
+            in_exclude = False
+            for e in exclude:
+                if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), name):
+                    in_exclude = True
+                    break
+
+            if not in_exclude:
+                media.append(os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT))
 
     return media
 
 
-def get_unused_media():
+def get_unused_media(exclude=[]):
     """
         Get media which are not used in models
     """
 
-    all_media = _get_all_media()
+    all_media = _get_all_media(exclude)
     used_media = get_used_media()
 
     return [t for t in all_media if t not in used_media]
