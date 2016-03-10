@@ -118,10 +118,14 @@ class UtilsTestCase(BaseTestCase):
     def test_command_call(self):
         expect(call_command('cleanup_unused_media', interactive=False)).Not.to_be_an_error()
 
+    def test_command_nothing_to_delete(self):
+        cmd = Command()
+        cmd.handle(interactive=False)
+        expect(cmd.stdout.getvalue().split('\n'))\
+            .to_include('Nothing to remove. Exit')
+
     def test_command_not_interactive(self):
-        expect(exists_media_path('file.txt')).to_be_false()
         create_file_and_write('file.txt')
-        expect(exists_media_path('file.txt')).to_be_true()
 
         cmd = Command()
         cmd.handle(interactive=False)
@@ -140,9 +144,7 @@ class UtilsTestCase(BaseTestCase):
         return mock.patch(builtins_raw_input, return_value=value)
 
     def test_command_interactive_n(self):
-        expect(exists_media_path('file.txt')).to_be_false()
         create_file_and_write('file.txt')
-        expect(exists_media_path('file.txt')).to_be_true()
 
         with self._patch_row_input('n'):
             cmd = Command()
@@ -153,9 +155,7 @@ class UtilsTestCase(BaseTestCase):
         expect(exists_media_path('file.txt')).to_be_true()
 
     def test_command_interactive_y(self):
-        expect(exists_media_path('file.txt')).to_be_false()
         create_file_and_write('file.txt')
-        expect(exists_media_path('file.txt')).to_be_true()
 
         with self._patch_row_input('Y'):
             cmd = Command()
