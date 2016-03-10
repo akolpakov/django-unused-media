@@ -8,7 +8,7 @@
 # http://www.opensource.org/licenses/MIT-license
 # Copyright (c) 2015, Andrey Kolpakov <aakolpakov@gmail.com>
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 try:
     from pypandoc import convert
@@ -34,7 +34,7 @@ tests_require = [
 
 setup(
     name='django-unused-media',
-    version='0.1.0',
+    version='0.1.1',
     description='Delete unused media files from Django project',
     long_description=read_md('README.md'),
     keywords='python django unused media remove delete',
@@ -53,7 +53,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
     ],
-    packages=['django_unused_media'],
+    packages=find_packages(),
     include_package_data=True,
     install_requires=[
         # add your dependencies here
