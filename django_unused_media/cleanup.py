@@ -80,3 +80,18 @@ def remove_unused_media():
         Remove unused media
     """
     _remove_media(get_unused_media())
+
+
+def remove_empty_dirs(path=settings.MEDIA_ROOT):
+    """
+        Recursively delete empty directories; return True if everything was deleted.
+    """
+
+    if not os.path.isdir(path):
+        return False
+
+    if all([remove_empty_dirs(os.path.join(path, filename)) for filename in os.listdir(path)]):
+        os.rmdir(path)
+        return True
+    else:
+        return False

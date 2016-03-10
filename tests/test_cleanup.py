@@ -6,7 +6,7 @@ from preggy import expect
 from django.db import models
 from django.core.management import call_command
 
-from django_unused_media.cleanup import _get_file_fields, _get_all_media, get_used_media, get_unused_media, _remove_media, remove_unused_media
+from django_unused_media.cleanup import _get_file_fields, _get_all_media, get_used_media, get_unused_media, _remove_media, remove_unused_media, remove_empty_dirs
 from django_unused_media.management.commands.cleanup_unused_media import Command
 from .base import BaseTestCase
 from .models import FileFieldsModel, CustomFileldsModel
@@ -114,6 +114,16 @@ class UtilsTestCase(BaseTestCase):
         expect(get_unused_media()).Not.to_be_empty()
         remove_unused_media()
         expect(get_unused_media()).to_be_empty()
+
+    def test_remove_empty_dirs(self):
+        create_file_and_write('sub1/sub2/sub3/notused.txt')
+        remove_unused_media()
+        remove_empty_dirs()
+        expect(exists_media_path('sub1/sub2/sub3')).to_be_false()
+        expect(exists_media_path('sub1/sub2')).to_be_false()
+        expect(exists_media_path('sub1')).to_be_false()
+
+    # Management command
 
     def test_command_call(self):
         expect(call_command('cleanup_unused_media', interactive=False)).Not.to_be_an_error()

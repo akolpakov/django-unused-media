@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from django_unused_media.cleanup import get_unused_media
+from django_unused_media.cleanup import get_unused_media, remove_empty_dirs
 
 import os
 
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         unused_media = get_unused_media()
 
         if not unused_media:
-            self.stdout.write('Nothing to remove. Exit')
+            self.stdout.write('Nothing to delete. Exit')
             return
 
         if options.get('interactive'):
@@ -49,5 +49,7 @@ class Command(BaseCommand):
         for f in unused_media:
             self.stdout.write('Remove %s' % f)
             os.remove(os.path.join(settings.MEDIA_ROOT, f))
+            
+        remove_empty_dirs()
 
         self.stdout.write('Done. %s unused files have been removed' % len(unused_media))
