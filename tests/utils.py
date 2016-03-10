@@ -13,7 +13,7 @@ def create_file(filename, data=None):
 
 
 def create_image(filename):
-    with open(os.path.join(settings.TEST_DIR, 'sample.jpg'), 'r') as f:
+    with open(os.path.join(settings.TEST_DIR, 'sample.jpg'), 'rb') as f:
         image = create_file(filename, f.read())
     return image
 

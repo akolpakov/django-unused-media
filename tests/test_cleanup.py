@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import mock
+import sys
 from preggy import expect
 from django.db import models
 from django.core.management import call_command
@@ -10,6 +11,9 @@ from django_unused_media.management.commands.cleanup_unused_media import Command
 from .base import BaseTestCase
 from .models import FileFieldsModel, CustomFileldsModel
 from .utils import create_file, create_image, create_file_and_write, exists_media_path
+
+
+_ver = sys.version_info
 
 
 class UtilsTestCase(BaseTestCase):
@@ -127,12 +131,20 @@ class UtilsTestCase(BaseTestCase):
 
         expect(exists_media_path('file.txt')).to_be_false()
 
+    def _patch_row_input(self, value):
+        if _ver >= (3, 0):
+            builtins_raw_input = 'builtins.input'
+        else:
+            builtins_raw_input = '__builtin__.raw_input'
+
+        return mock.patch(builtins_raw_input, return_value=value)
+
     def test_command_interactive_n(self):
         expect(exists_media_path('file.txt')).to_be_false()
         create_file_and_write('file.txt')
         expect(exists_media_path('file.txt')).to_be_true()
 
-        with mock.patch('__builtin__.raw_input', return_value='n'):
+        with self._patch_row_input('n'):
             cmd = Command()
             cmd.handle(interactive=True)
             expect(cmd.stdout.getvalue().split('\n'))\
@@ -145,7 +157,7 @@ class UtilsTestCase(BaseTestCase):
         create_file_and_write('file.txt')
         expect(exists_media_path('file.txt')).to_be_true()
 
-        with mock.patch('__builtin__.raw_input', return_value='Y'):
+        with self._patch_row_input('Y'):
             cmd = Command()
             cmd.handle(interactive=True)
             expect(cmd.stdout.getvalue().split('\n'))\

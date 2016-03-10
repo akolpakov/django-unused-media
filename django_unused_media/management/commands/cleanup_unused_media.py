@@ -31,7 +31,10 @@ class Command(BaseCommand):
             for f in unused_media:
                 self.stdout.write(f)
 
-            if raw_input('Are you sure you want to remove %s unused files? (Y/n)' % len(unused_media)) != 'Y':
+            try: input = raw_input
+            except NameError: pass
+
+            if input('Are you sure you want to remove %s unused files? (Y/n)' % len(unused_media)) != 'Y':
                 self.stdout.write('Interrupted by user. Exit.')
                 return
 

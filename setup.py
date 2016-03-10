@@ -23,7 +23,7 @@ tests_require = [
     'coverage',
     'yanc',
     'preggy',
-    'tox',
+    'tox<2.0',
     'ipdb',
     'coveralls',
     'sphinx',
