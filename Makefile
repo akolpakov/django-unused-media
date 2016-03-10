@@ -33,5 +33,8 @@ tox:
 #docs:
 	#@cd django_paynova/docs && make html && open _build/html/index.html
 
+register:
+	@python setup.py sdist register
+
 upload:
 	@python setup.py sdist upload
