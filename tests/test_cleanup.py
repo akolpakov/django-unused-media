@@ -163,33 +163,25 @@ class UtilsTestCase(BaseTestCase):
 
         expect(exists_media_path('file.txt')).to_be_false()
 
-    def _patch_row_input(self, value):
-        if _ver >= (3, 0):
-            builtins_raw_input = 'builtins.input'
-        else:
-            builtins_raw_input = '__builtin__.raw_input'
-
-        return mock.patch(builtins_raw_input, return_value=value)
-
-    def test_command_interactive_n(self):
+    @mock.patch('six.moves.input', return_value='n')
+    def test_command_interactive_n(self, mock_input):
         create_file_and_write('file.txt')
 
-        with self._patch_row_input('n'):
-            cmd = Command()
-            cmd.handle(interactive=True)
-            expect(cmd.stdout.getvalue().split('\n'))\
-                .to_include('Interrupted by user. Exit.')
+        cmd = Command()
+        cmd.handle(interactive=True)
+        expect(cmd.stdout.getvalue().split('\n'))\
+            .to_include('Interrupted by user. Exit.')
 
         expect(exists_media_path('file.txt')).to_be_true()
 
-    def test_command_interactive_y(self):
+    @mock.patch('six.moves.input', return_value='Y')
+    def test_command_interactive_y(self, mock_input):
         create_file_and_write('file.txt')
 
-        with self._patch_row_input('Y'):
-            cmd = Command()
-            cmd.handle(interactive=True)
-            expect(cmd.stdout.getvalue().split('\n'))\
-                .to_include('Remove file.txt')\
-                .to_include('Done. 1 unused files have been removed')
+        cmd = Command()
+        cmd.handle(interactive=True)
+        expect(cmd.stdout.getvalue().split('\n'))\
+            .to_include('Remove file.txt')\
+            .to_include('Done. 1 unused files have been removed')
 
         expect(exists_media_path('file.txt')).to_be_false()

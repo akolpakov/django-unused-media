@@ -26,6 +26,9 @@ unit:
 coverage-html: unit
 	@coverage html
 
+test_no_coverage:
+	python ./tests/runtests.py
+
 # run tests against all supported python versions
 tox:
 	@tox

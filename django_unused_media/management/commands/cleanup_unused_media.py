@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+import six.moves
 
 from django_unused_media.cleanup import get_unused_media, remove_empty_dirs
 
@@ -41,14 +42,9 @@ class Command(BaseCommand):
             for f in unused_media:
                 self.stdout.write(f)
 
-            # raw_input for python2 and input for python3
-
-            try: input = raw_input
-            except NameError: pass
-
             # ask user
 
-            if input('Are you sure you want to remove %s unused files? (Y/n)' % len(unused_media)) != 'Y':
+            if six.moves.input('Are you sure you want to remove %s unused files? (Y/n)' % len(unused_media)) != 'Y':
                 self.stdout.write('Interrupted by user. Exit.')
                 return
 

@@ -8,4 +8,7 @@ from django_nose import NoseTestSuiteRunner
 
 
 if __name__ == '__main__':
-    NoseTestSuiteRunner(verbosity=1).run_tests(['tests'])
+    if NoseTestSuiteRunner(verbosity=1).run_tests(['tests']) > 0:
+        exit(1)
+    else:
+        exit(0)
