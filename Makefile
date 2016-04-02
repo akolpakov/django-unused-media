@@ -33,9 +33,6 @@ test_no_coverage:
 tox:
 	@tox
 
-#docs:
-	#@cd django_paynova/docs && make html && open _build/html/index.html
-
 register:
 	@python setup.py sdist register
 

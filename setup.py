@@ -24,17 +24,14 @@ tests_require = [
     'yanc',
     'preggy',
     'tox<2.0',
-    'ipdb',
     'coveralls',
-    'sphinx',
     'django_nose',
-    'httmock',
     'pypandoc',
 ]
 
 setup(
     name='django-unused-media',
-    version='0.1.3',
+    version='0.1.4',
     description='Delete unused media files from Django project',
     long_description=read_md('README.md'),
     keywords='python django unused media remove delete',
@@ -49,7 +46,9 @@ setup(
         'Natural Language :: English',
         'Operating System :: Unix',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
     ],
@@ -58,7 +57,7 @@ setup(
     install_requires=[
         # add your dependencies here
         # remember to use 'package-name>=x.y.z,<x.y+1.0' notation (this way you get bugfixes)
-        'django>=1.6,<1.9',
+        'django>=1.6,<1.10',
         'six',
     ],
     extras_require={

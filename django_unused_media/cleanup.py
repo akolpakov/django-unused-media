@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.apps import apps
 from django.conf import settings
 
 import os
@@ -12,9 +13,18 @@ def _get_file_fields():
         Get all fields which are inherited from FileField
     """
 
+    # get models. Compatibility with 1.6
+
+    if getattr(apps, 'get_models'):
+        all_models = apps.get_models()
+    else:
+        all_models = models.get_models()
+
+    # get fields
+
     fields = []
 
-    for m in models.get_models():
+    for m in all_models:
         for f in m._meta.get_fields():
             if isinstance(f, models.FileField):
                 fields.append(f)
