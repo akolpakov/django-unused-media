@@ -6,6 +6,7 @@ from django.conf import settings
 
 import os
 import re
+import six
 
 
 def _get_file_fields():
@@ -48,7 +49,7 @@ def get_used_media():
         }
 
         for t in f.model.objects.values(f.name).exclude(**is_empty).exclude(**is_null):
-            media.append(t.get(f.name))
+            media.append(six.text_type(t.get(f.name)))
 
     return media
 
@@ -60,7 +61,7 @@ def _get_all_media(exclude=[]):
 
     media = []
 
-    for root, dirs, files in os.walk(settings.MEDIA_ROOT):
+    for root, dirs, files in os.walk(six.text_type(settings.MEDIA_ROOT)):
         for name in files:
             in_exclude = False
             for e in exclude:

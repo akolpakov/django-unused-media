@@ -2,6 +2,8 @@
 
 import mock
 import sys
+import six
+
 from preggy import expect
 from django.db import models
 from django.core.management import call_command
@@ -76,7 +78,7 @@ class UtilsTestCase(BaseTestCase):
             .to_include(self.model3.custom_field.name)
 
     def test_get_all_media_with_additional(self):
-        create_file_and_write('file.txt')
+        create_file_and_write(u'file.txt')
         expect(_get_all_media())\
             .to_be_instance_of(list).to_length(6)\
             .to_include(self.model1.file_field.name)\
@@ -84,15 +86,15 @@ class UtilsTestCase(BaseTestCase):
             .to_include(self.model2.file_field.name)\
             .to_include(self.model2.image_field.name)\
             .to_include(self.model3.custom_field.name)\
-            .to_include('file.txt')
+            .to_include(u'file.txt')
 
     def test_get_all_media_with_exclude(self):
-        create_file_and_write('file.txt')
-        create_file_and_write('.file2.txt')
-        create_file_and_write('test.txt')
-        create_file_and_write('one.png')
-        create_file_and_write('two.png')
-        create_file_and_write('three.png')
+        create_file_and_write(u'file.txt')
+        create_file_and_write(u'.file2.txt')
+        create_file_and_write(u'test.txt')
+        create_file_and_write(u'one.png')
+        create_file_and_write(u'two.png')
+        create_file_and_write(u'three.png')
         expect(_get_all_media(['.*', '*.png', 'test.txt']))\
             .to_be_instance_of(list).to_length(6)\
             .to_include(self.model1.file_field.name)\
@@ -100,46 +102,46 @@ class UtilsTestCase(BaseTestCase):
             .to_include(self.model2.file_field.name)\
             .to_include(self.model2.image_field.name)\
             .to_include(self.model3.custom_field.name)\
-            .to_include('file.txt')\
-            .Not.to_include('.file2.txt')\
-            .Not.to_include('test.txt')
+            .to_include(u'file.txt')\
+            .Not.to_include(u'.file2.txt')\
+            .Not.to_include(u'test.txt')
 
     def test_get_unused_media_empty(self):
         expect(get_unused_media()).to_be_empty()
 
     def test_get_unused_media(self):
-        create_file_and_write('notused.txt')
+        create_file_and_write(u'notused.txt')
         used_media = get_unused_media()
         expect(used_media).to_be_instance_of(list).to_length(1)
         expect(used_media[0]).to_match(r'^.*notused.txt')
 
     def test_get_unused_media_subfolder(self):
-        create_file_and_write('subfolder/notused.txt')
+        create_file_and_write(u'subfolder/notused.txt')
         used_media = get_unused_media()
         expect(used_media).to_be_instance_of(list).to_length(1)
         expect(used_media[0]).to_match(r'^.*subfolder/notused.txt$')
 
     def test_remove_media(self):
-        expect(exists_media_path('file.txt')).to_be_false()
-        create_file_and_write('file.txt')
-        expect(exists_media_path('file.txt')).to_be_true()
-        _remove_media(['file.txt'])
-        expect(exists_media_path('file.txt')).to_be_false()
+        expect(exists_media_path(u'file.txt')).to_be_false()
+        create_file_and_write(u'file.txt')
+        expect(exists_media_path(u'file.txt')).to_be_true()
+        _remove_media([u'file.txt'])
+        expect(exists_media_path(u'file.txt')).to_be_false()
 
     def test_remove_unused_media(self):
         expect(get_unused_media()).to_be_empty()
-        create_file_and_write('notused.txt')
+        create_file_and_write(u'notused.txt')
         expect(get_unused_media()).Not.to_be_empty()
         remove_unused_media()
         expect(get_unused_media()).to_be_empty()
 
     def test_remove_empty_dirs(self):
-        create_file_and_write('sub1/sub2/sub3/notused.txt')
+        create_file_and_write(u'sub1/sub2/sub3/notused.txt')
         remove_unused_media()
         remove_empty_dirs()
-        expect(exists_media_path('sub1/sub2/sub3')).to_be_false()
-        expect(exists_media_path('sub1/sub2')).to_be_false()
-        expect(exists_media_path('sub1')).to_be_false()
+        expect(exists_media_path(u'sub1/sub2/sub3')).to_be_false()
+        expect(exists_media_path(u'sub1/sub2')).to_be_false()
+        expect(exists_media_path(u'sub1')).to_be_false()
 
     # Management command
 
@@ -165,18 +167,18 @@ class UtilsTestCase(BaseTestCase):
 
     @mock.patch('six.moves.input', return_value='n')
     def test_command_interactive_n(self, mock_input):
-        create_file_and_write('file.txt')
+        create_file_and_write(u'file.txt')
 
         cmd = Command()
         cmd.handle(interactive=True)
         expect(cmd.stdout.getvalue().split('\n'))\
             .to_include('Interrupted by user. Exit.')
 
-        expect(exists_media_path('file.txt')).to_be_true()
+        expect(exists_media_path(u'file.txt')).to_be_true()
 
     @mock.patch('six.moves.input', return_value='Y')
     def test_command_interactive_y(self, mock_input):
-        create_file_and_write('file.txt')
+        create_file_and_write(u'file.txt')
 
         cmd = Command()
         cmd.handle(interactive=True)
@@ -184,4 +186,23 @@ class UtilsTestCase(BaseTestCase):
             .to_include('Remove file.txt')\
             .to_include('Done. 1 unused files have been removed')
 
-        expect(exists_media_path('file.txt')).to_be_false()
+        expect(exists_media_path(u'file.txt')).to_be_false()
+
+    @mock.patch('six.moves.input', return_value='Y')
+    def test_command_interactive_y_with_ascii(self, mock_input):
+        create_file_and_write(u'Тест.txt')
+
+        cmd = Command()
+        cmd.handle(interactive=True)
+        expect(cmd.stdout.getvalue().split('\n'))\
+            .to_include('Remove Тест.txt')\
+            .to_include('Done. 1 unused files have been removed')
+
+        expect(exists_media_path(u'Тест.txt')).to_be_false()
+
+    def test_ascii_filenames(self):
+        create_file_and_write(u'Тест.txt')
+        used_media = get_unused_media()
+        expect(used_media).to_be_instance_of(list).to_length(1)
+        expect(used_media[0]).to_be_instance_of(six.text_type)
+        expect(used_media[0]).to_equal(u'Тест.txt')
