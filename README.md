@@ -43,7 +43,7 @@ To avoid operating on files whose names match a particular pattern. Pattern supp
 
 For example, to keep `.gitignore` and `*.png` files you can use:
 ```
-./manage.py cleanup_unused_media -e .gitignore -e *.png
+./manage.py cleanup_unused_media -e *.gitignore -e *.png
 ```
 
 Also you can exclude entire folder or files in that folder (path should be relative to `settings.MEDIA_ROOT`):
