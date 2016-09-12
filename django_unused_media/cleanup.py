@@ -54,31 +54,38 @@ def get_used_media():
     return media
 
 
-def _get_all_media(exclude=[]):
+def _get_all_media(exclude=None):
     """
         Get all media from MEDIA_ROOT
     """
+
+    if not exclude:
+        exclude = []
 
     media = []
 
     for root, dirs, files in os.walk(six.text_type(settings.MEDIA_ROOT)):
         for name in files:
+            rel_path = os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT)
             in_exclude = False
             for e in exclude:
-                if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), name):
+                if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), rel_path):
                     in_exclude = True
                     break
 
             if not in_exclude:
-                media.append(os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT))
+                media.append(rel_path)
 
     return media
 
 
-def get_unused_media(exclude=[]):
+def get_unused_media(exclude=None):
     """
         Get media which are not used in models
     """
+
+    if not exclude:
+        exclude = []
 
     all_media = _get_all_media(exclude)
     used_media = get_used_media()

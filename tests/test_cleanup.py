@@ -92,11 +92,12 @@ class UtilsTestCase(BaseTestCase):
         create_file_and_write(u'file.txt')
         create_file_and_write(u'.file2.txt')
         create_file_and_write(u'test.txt')
+        create_file_and_write(u'do_not_exclude/test.txt')
         create_file_and_write(u'one.png')
         create_file_and_write(u'two.png')
         create_file_and_write(u'three.png')
         expect(_get_all_media(['.*', '*.png', 'test.txt']))\
-            .to_be_instance_of(list).to_length(6)\
+            .to_be_instance_of(list).to_length(7)\
             .to_include(self.model1.file_field.name)\
             .to_include(self.model1.image_field.name)\
             .to_include(self.model2.file_field.name)\
@@ -104,7 +105,23 @@ class UtilsTestCase(BaseTestCase):
             .to_include(self.model3.custom_field.name)\
             .to_include(u'file.txt')\
             .Not.to_include(u'.file2.txt')\
-            .Not.to_include(u'test.txt')
+            .Not.to_include(u'test.txt')\
+            .to_include(u'do_not_exclude/test.txt')
+
+    def test_get_all_media_with_exclude_folder(self):
+        create_file_and_write(u'exclude_dir/file1.txt')
+        create_file_and_write(u'exclude_dir/file2.txt')
+        create_file_and_write(u'file3.txt')
+        expect(_get_all_media(['exclude_dir/*']))\
+            .to_be_instance_of(list).to_length(6)\
+            .to_include(self.model1.file_field.name)\
+            .to_include(self.model1.image_field.name)\
+            .to_include(self.model2.file_field.name)\
+            .to_include(self.model2.image_field.name)\
+            .to_include(self.model3.custom_field.name)\
+            .to_include(u'file3.txt')\
+            .Not.to_include(u'exclude_dir/file1.txt')\
+            .Not.to_include(u'exclude_dir/file2.txt')
 
     def test_get_unused_media_empty(self):
         expect(get_unused_media()).to_be_empty()
