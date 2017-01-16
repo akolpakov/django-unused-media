@@ -15,9 +15,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
 
-        parser.add_argument('--noinput',
+        parser.add_argument('--noinput', '--no-input',
                             dest='interactive',
-                            action='store_true',
+                            action='store_false',
                             default=True,
                             help='Do not ask confirmation')
 

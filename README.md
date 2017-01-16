@@ -30,7 +30,7 @@ By default command runs in interactive mode. And before removing list of files w
 
 ### Options
 
-`--noinput` 
+`--noinput`, `--no-input`
 
 Non interactive mode. Command will remove files without confirmation from user. Useful for scripts.
 ```
