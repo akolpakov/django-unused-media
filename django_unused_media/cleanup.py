@@ -40,16 +40,29 @@ def get_used_media():
 
     media = []
 
-    for f in _get_file_fields():
+    for field in _get_file_fields():
         is_null = {
-            '%s__isnull' % f.name: True,
+            '%s__isnull' % field.name: True,
         }
         is_empty = {
-            '%s' % f.name: '',
+            '%s' % field.name: '',
         }
 
-        for t in f.model.objects.values(f.name).exclude(**is_empty).exclude(**is_null):
-            media.append(six.text_type(t.get(f.name)))
+        if hasattr(field, 'variations'):  # django-stdimage has a variatons field for different sizes of images
+            image_varitions = [key for key, val in field.variations.iteritems()] # get key names for variations
+
+            for model_obj in field.model.objects.exclude(**is_empty).exclude(**is_null):
+                image_field = getattr(model_obj, field.name)
+
+                media.append(six.text_type(image_field))  # Original image is used
+
+                for variant in image_varitions: # Check if variant of image exists
+                    variant_image = getattr(image_field, variant, None)
+                    if variant_image:
+                        media.append(six.text_type(variant_image))
+        else:
+            for t in field.model.objects.values(field.name).exclude(**is_empty).exclude(**is_null):
+                media.append(six.text_type(t.get(field.name)))
 
     return media
 
