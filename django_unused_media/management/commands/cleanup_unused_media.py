@@ -44,7 +44,7 @@ class Command(BaseCommand):
 
             # ask user
 
-            if six.moves.input('Are you sure you want to remove %s unused files? (Y/n)' % len(unused_media)) != 'Y':
+            if six.moves.input('Are you sure you want to remove %s unused files? (y/N)' % len(unused_media)) != 'Y':
                 self.stdout.write('Interrupted by user. Exit.')
                 return
 
