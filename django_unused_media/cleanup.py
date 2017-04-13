@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from django.db import models
-from django.apps import apps
-from django.conf import settings
-
 import os
 import re
+
 import six
+from django.apps import apps
+from django.conf import settings
+from django.db import models
 
 
 def _get_file_fields():
@@ -49,14 +49,14 @@ def get_used_media():
         }
 
         if hasattr(field, 'variations'):  # django-stdimage has a variatons field for different sizes of images
-            image_varitions = [key for key, val in field.variations.iteritems()] # get key names for variations
+            image_varitions = [key for key, val in field.variations.iteritems()]  # get key names for variations
 
             for model_obj in field.model.objects.exclude(**is_empty).exclude(**is_null):
                 image_field = getattr(model_obj, field.name)
 
                 media.append(six.text_type(image_field))  # Original image is used
 
-                for variant in image_varitions: # Check if variant of image exists
+                for variant in image_varitions:  # Check if variant of image exists
                     variant_image = getattr(image_field, variant, None)
                     if variant_image:
                         media.append(six.text_type(variant_image))
@@ -102,6 +102,10 @@ def get_unused_media(exclude=None):
 
     all_media = _get_all_media(exclude)
     used_media = get_used_media()
+
+    for i in xrange(len(used_media)):  # Sometimes the image returned has a ./img.jpg format, which doesnt match.
+        if used_media[i][0:2] == './':
+            used_media[i] = used_media[i].replace('./', '')
 
     return [t for t in all_media if t not in used_media]
 
