@@ -14,4 +14,5 @@ class BaseTestCase(TestCase):
         os.makedirs(settings.MEDIA_ROOT)
 
     def tearDown(self):
-        shutil.rmtree(settings.MEDIA_ROOT)
+        if os.path.exists(settings.MEDIA_ROOT):
+            shutil.rmtree(settings.MEDIA_ROOT)
