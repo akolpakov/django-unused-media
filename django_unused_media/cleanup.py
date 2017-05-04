@@ -48,8 +48,8 @@ def get_used_media():
             '%s' % field.name: '',
         }
 
-        for obj in field.model.objects.values(field.name).exclude(**is_empty).exclude(**is_null):
-            media.append(six.text_type(obj.get(field.name)))
+        for obj in field.model.objects.exclude(**is_empty).exclude(**is_null):
+            media.append(os.path.relpath(getattr(obj, field.name).url))
 
     return media
 

@@ -18,34 +18,30 @@ from .utils import create_file, create_image, create_file_and_write, exists_medi
 _ver = sys.version_info
 
 
-class UtilsTestCase(BaseTestCase):
+class TestCleanup(BaseTestCase):
     def setUp(self):
-        super(UtilsTestCase, self).setUp()
+        super(TestCleanup, self).setUp()
 
-        self.model1 = FileFieldsModel(
+        self.model1 = FileFieldsModel.objects.create(
             file_field=create_file('file1.txt'),
             image_field=create_image('image1.jpg'),
             char_field='test1'
         )
-        self.model1.save()
 
-        self.model2 = FileFieldsModel(
+        self.model2 = FileFieldsModel.objects.create(
             file_field=create_file('file2.txt'),
             image_field=create_image('image2.jpg'),
             char_field='test2'
         )
-        self.model2.save()
 
-        self.model3 = CustomFileldsModel(
+        self.model3 = CustomFileldsModel.objects.create(
             custom_field=create_file('file3.txt'),
             char_field='test3'
         )
-        self.model3.save()
 
-        self.model4 = CustomFileldsModel(
+        self.model4 = CustomFileldsModel.objects.create(
             char_field='test4'
         )
-        self.model4.save()
 
     def test_get_file_fields(self):
         file_fields = _get_file_fields()
@@ -62,30 +58,30 @@ class UtilsTestCase(BaseTestCase):
     def test_get_used_media(self):
         expect(get_used_media())\
             .to_be_instance_of(list).to_length(5)\
-            .to_include(self.model1.file_field.name)\
-            .to_include(self.model1.image_field.name)\
-            .to_include(self.model2.file_field.name)\
-            .to_include(self.model2.image_field.name)\
-            .to_include(self.model3.custom_field.name)
+            .to_include(self.model1.file_field.url)\
+            .to_include(self.model1.image_field.url)\
+            .to_include(self.model2.file_field.url)\
+            .to_include(self.model2.image_field.url)\
+            .to_include(self.model3.custom_field.url)
 
     def test_get_all_media(self):
         expect(_get_all_media())\
             .to_be_instance_of(list).to_length(5)\
-            .to_include(self.model1.file_field.name)\
-            .to_include(self.model1.image_field.name)\
-            .to_include(self.model2.file_field.name)\
-            .to_include(self.model2.image_field.name)\
-            .to_include(self.model3.custom_field.name)
+            .to_include(self.model1.file_field.url)\
+            .to_include(self.model1.image_field.url)\
+            .to_include(self.model2.file_field.url)\
+            .to_include(self.model2.image_field.url)\
+            .to_include(self.model3.custom_field.url)
 
     def test_get_all_media_with_additional(self):
         create_file_and_write(u'file.txt')
         expect(_get_all_media())\
             .to_be_instance_of(list).to_length(6)\
-            .to_include(self.model1.file_field.name)\
-            .to_include(self.model1.image_field.name)\
-            .to_include(self.model2.file_field.name)\
-            .to_include(self.model2.image_field.name)\
-            .to_include(self.model3.custom_field.name)\
+            .to_include(self.model1.file_field.url)\
+            .to_include(self.model1.image_field.url)\
+            .to_include(self.model2.file_field.url)\
+            .to_include(self.model2.image_field.url)\
+            .to_include(self.model3.custom_field.url)\
             .to_include(u'file.txt')
 
     def test_get_all_media_with_exclude(self):
@@ -98,11 +94,11 @@ class UtilsTestCase(BaseTestCase):
         create_file_and_write(u'three.png')
         expect(_get_all_media(['.*', '*.png', 'test.txt']))\
             .to_be_instance_of(list).to_length(7)\
-            .to_include(self.model1.file_field.name)\
-            .to_include(self.model1.image_field.name)\
-            .to_include(self.model2.file_field.name)\
-            .to_include(self.model2.image_field.name)\
-            .to_include(self.model3.custom_field.name)\
+            .to_include(self.model1.file_field.url)\
+            .to_include(self.model1.image_field.url)\
+            .to_include(self.model2.file_field.url)\
+            .to_include(self.model2.image_field.url)\
+            .to_include(self.model3.custom_field.url)\
             .to_include(u'file.txt')\
             .Not.to_include(u'.file2.txt')\
             .Not.to_include(u'test.txt')\
@@ -114,11 +110,11 @@ class UtilsTestCase(BaseTestCase):
         create_file_and_write(u'file3.txt')
         expect(_get_all_media(['exclude_dir/*']))\
             .to_be_instance_of(list).to_length(6)\
-            .to_include(self.model1.file_field.name)\
-            .to_include(self.model1.image_field.name)\
-            .to_include(self.model2.file_field.name)\
-            .to_include(self.model2.image_field.name)\
-            .to_include(self.model3.custom_field.name)\
+            .to_include(self.model1.file_field.url)\
+            .to_include(self.model1.image_field.url)\
+            .to_include(self.model2.file_field.url)\
+            .to_include(self.model2.image_field.url)\
+            .to_include(self.model3.custom_field.url)\
             .to_include(u'file3.txt')\
             .Not.to_include(u'exclude_dir/file1.txt')\
             .Not.to_include(u'exclude_dir/file2.txt')
@@ -160,7 +156,20 @@ class UtilsTestCase(BaseTestCase):
         expect(exists_media_path(u'sub1/sub2')).to_be_false()
         expect(exists_media_path(u'sub1')).to_be_false()
 
-    # Management command
+    def test_ascii_filenames(self):
+        create_file_and_write(u'Тест.txt')
+        used_media = get_unused_media()
+        expect(used_media).to_be_instance_of(list).to_length(1)
+        expect(used_media[0]).to_be_instance_of(six.text_type)
+        expect(used_media[0]).to_equal(u'Тест.txt')
+
+    def test_relative_path(self):
+        FileFieldsModel.objects.create(
+            file_field='./test_rel_path/file1.txt',
+        )
+        expect(get_used_media()) \
+            .to_be_instance_of(list)\
+            .to_include('test_rel_path/file1.txt')
 
     def test_command_call(self):
         expect(call_command('cleanup_unused_media', interactive=False)).Not.to_be_an_error()
@@ -216,10 +225,3 @@ class UtilsTestCase(BaseTestCase):
             .to_include('Done. 1 unused files have been removed')
 
         expect(exists_media_path(u'Тест.txt')).to_be_false()
-
-    def test_ascii_filenames(self):
-        create_file_and_write(u'Тест.txt')
-        used_media = get_unused_media()
-        expect(used_media).to_be_instance_of(list).to_length(1)
-        expect(used_media[0]).to_be_instance_of(six.text_type)
-        expect(used_media[0]).to_equal(u'Тест.txt')
