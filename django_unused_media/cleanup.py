@@ -25,10 +25,10 @@ def _get_file_fields():
 
     fields = []
 
-    for m in all_models:
-        for f in m._meta.get_fields():
-            if isinstance(f, models.FileField):
-                fields.append(f)
+    for model in all_models:
+        for field in model._meta.get_fields():
+            if isinstance(field, models.FileField):
+                fields.append(field)
 
     return fields
 
@@ -40,16 +40,16 @@ def get_used_media():
 
     media = []
 
-    for f in _get_file_fields():
+    for field in _get_file_fields():
         is_null = {
-            '%s__isnull' % f.name: True,
+            '%s__isnull' % field.name: True,
         }
         is_empty = {
-            '%s' % f.name: '',
+            '%s' % field.name: '',
         }
 
-        for t in f.model.objects.values(f.name).exclude(**is_empty).exclude(**is_null):
-            media.append(six.text_type(t.get(f.name)))
+        for obj in field.model.objects.values(field.name).exclude(**is_empty).exclude(**is_null):
+            media.append(six.text_type(obj.get(field.name)))
 
     return media
 
@@ -90,15 +90,15 @@ def get_unused_media(exclude=None):
     all_media = _get_all_media(exclude)
     used_media = get_used_media()
 
-    return [t for t in all_media if t not in used_media]
+    return [x for x in all_media if x not in used_media]
 
 
 def _remove_media(files):
     """
         Delete file from media dir
     """
-    for f in files:
-        os.remove(os.path.join(settings.MEDIA_ROOT, f))
+    for file in files:
+        os.remove(os.path.join(settings.MEDIA_ROOT, file))
 
 
 def remove_unused_media():
