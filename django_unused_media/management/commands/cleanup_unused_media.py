@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 import six.moves
 
@@ -27,6 +26,12 @@ class Command(BaseCommand):
                             default=[],
                             help='Exclude files by mask (only * is supported), can use multiple --exclude')
 
+        parser.add_argument('-r', '--remove-empty-dirs',
+                            dest='remove_empty_dirs',
+                            action='store_false',
+                            default=False,
+                            help='Remove empty dirs after files cleanup')
+
     def handle(self, *args, **options):
 
         unused_media = get_unused_media(options.get('exclude') or [])
@@ -44,14 +49,15 @@ class Command(BaseCommand):
 
             # ask user
 
-            if six.moves.input('Are you sure you want to remove %s unused files? (y/N)' % len(unused_media)) != 'Y':
+            if six.moves.input('Are you sure you want to remove %s unused files? (Y/N)' % len(unused_media)) != 'Y':
                 self.stdout.write('Interrupted by user. Exit.')
                 return
 
         for f in unused_media:
             self.stdout.write('Remove %s' % f)
-            os.remove(os.path.join(settings.MEDIA_ROOT, f))
+            os.remove(f)
 
-        remove_empty_dirs()
+        if options.get('remove_empty_dirs'):
+            remove_empty_dirs()
 
         self.stdout.write('Done. %s unused files have been removed' % len(unused_media))
