@@ -1,7 +1,6 @@
 # Delete unused media files from Django project
 
 [![build-status-image]][travis]
-[![coverage-status-image]][codecov]
 
 This package provides management command `cleanup_unused_media` for Django applications. With help of this management command you can remove all media files which are no longer used (files without references from any Django model with `FileField` or `ImageField` fields or their inheritances).
 
@@ -12,9 +11,9 @@ This package provides management command `cleanup_unused_media` for Django appli
     pip install django-unused-media
     ```
 
-    Python 2.7, 3.5, PyPy are tested with tox.
+    Python 2.7, 3.5, 3.6, PyPy are tested with tox.
     
-    Django 1.6, 1.7, 1.8, 1.9, 1.10 are tested with tox.
+    Django 1.6, 1.7, 1.8, 1.9, 1.10, 1.11 are tested with tox.
 
 2.  Add ``django-unused-media`` to ``INSTALLED_APPS``:
     ```python
@@ -73,3 +72,6 @@ make test
 
 # License
 [MIT licence](./LICENSE)
+
+[build-status-image]: https://api.travis-ci.org/vartagg/django-unused-media.svg?branch=master
+[travis]: http://travis-ci.org/vartagg/django-unused-media?branch=master
