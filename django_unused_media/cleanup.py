@@ -9,6 +9,12 @@ import re
 import six
 
 
+if os.path.isabs(settings.MEDIA_ROOT):
+    MEDIA_ROOT = settings.MEDIA_ROOT
+else:
+    MEDIA_ROOT = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT)
+
+
 def _get_file_fields():
     """
         Get all fields which are inherited from FileField
@@ -49,7 +55,8 @@ def get_used_media():
         }
 
         for obj in field.model.objects.exclude(**is_empty).exclude(**is_null):
-            media.append(os.path.relpath(getattr(obj, field.name).url))
+            path = getattr(obj, field.name).path
+            media.append(path)
 
     return media
 
@@ -64,17 +71,18 @@ def _get_all_media(exclude=None):
 
     media = []
 
-    for root, dirs, files in os.walk(six.text_type(settings.MEDIA_ROOT)):
+    for root, dirs, files in os.walk(six.text_type(MEDIA_ROOT)):
         for name in files:
-            rel_path = os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT)
+            path = os.path.join(MEDIA_ROOT, root, name)
+            relpath = os.path.relpath(path, MEDIA_ROOT)
             in_exclude = False
             for e in exclude:
-                if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), rel_path):
+                if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), relpath):
                     in_exclude = True
                     break
 
             if not in_exclude:
-                media.append(rel_path)
+                media.append(path)
 
     return media
 
@@ -98,7 +106,7 @@ def _remove_media(files):
         Delete file from media dir
     """
     for file in files:
-        os.remove(os.path.join(settings.MEDIA_ROOT, file))
+        os.remove(os.path.join(MEDIA_ROOT, file))
 
 
 def remove_unused_media():
@@ -108,7 +116,7 @@ def remove_unused_media():
     _remove_media(get_unused_media())
 
 
-def remove_empty_dirs(path=settings.MEDIA_ROOT):
+def remove_empty_dirs(path=MEDIA_ROOT):
     """
         Recursively delete empty directories; return True if everything was deleted.
     """
