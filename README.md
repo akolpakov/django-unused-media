@@ -1,5 +1,7 @@
 # Delete unused media files from Django project
 
+[![build-status-image]][travis]
+
 This package provides management command `cleanup_unused_media` for Django applications. With help of this management command you can remove all media files which are no longer used (files without references from any Django model with `FileField` or `ImageField` fields or their inheritances).
 
 # Installation
@@ -70,3 +72,6 @@ make test
 
 # License
 [MIT licence](./LICENSE)
+
+[build-status-image]: https://api.travis-ci.org/akolpakov/django-unused-media.svg?branch=master
+[travis]: http://travis-ci.org/akolpakov/django-unused-media?branch=master
