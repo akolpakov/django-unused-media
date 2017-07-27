@@ -21,3 +21,7 @@ install:
 script:
     # run tests
     - make test
+
+addons:
+    apt_packages:
+        - pandoc
