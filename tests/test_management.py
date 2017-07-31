@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import mock
-import sys
 import six
 
 from preggy import expect
@@ -9,7 +8,6 @@ from django.core.management import call_command
 
 from django_unused_media.management.commands.cleanup_unused_media import Command
 from .base import BaseTestCase
-from .utils import create_file_and_write, exists_media_path, get_media_path
 
 
 class TestManagementCommand(BaseTestCase):
@@ -23,44 +21,44 @@ class TestManagementCommand(BaseTestCase):
             .to_include(u'Nothing to delete. Exit')
 
     def test_command_not_interactive(self):
-        create_file_and_write('file.txt')
+        self._media_create('file.txt')
 
         cmd = Command()
         cmd.handle(interactive=False)
         expect(cmd.stdout.getvalue().split('\n'))\
-            .to_include(u'Remove {}'.format(get_media_path(u'file.txt')))\
+            .to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt')))\
             .to_include(u'Done. 1 unused files have been removed')
 
-        expect(exists_media_path('file.txt')).to_be_false()
+        expect(self._media_exists('file.txt')).to_be_false()
 
     @mock.patch('six.moves.input', return_value='n')
     def test_command_interactive_n(self, mock_input):
-        create_file_and_write(u'file.txt')
+        self._media_create(u'file.txt')
 
         cmd = Command()
         cmd.handle(interactive=True)
         expect(cmd.stdout.getvalue().split('\n'))\
             .to_include(u'Interrupted by user. Exit.')
 
-        expect(exists_media_path(u'file.txt')).to_be_true()
+        expect(self._media_exists(u'file.txt')).to_be_true()
 
     @mock.patch('six.moves.input', return_value='Y')
     def test_command_interactive_y(self, mock_input):
-        create_file_and_write(u'file.txt')
+        self._media_create(u'file.txt')
 
         cmd = Command()
         cmd.handle(interactive=True)
         expect(cmd.stdout.getvalue().split('\n')) \
-            .to_include(u'Remove {}'.format(get_media_path(u'file.txt'))) \
+            .to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt'))) \
             .to_include(u'Done. 1 unused files have been removed')
 
-        expect(exists_media_path(u'file.txt')).to_be_false()
+        expect(self._media_exists(u'file.txt')).to_be_false()
 
     @mock.patch('six.moves.input', return_value='Y')
     def test_command_interactive_y_with_ascii(self, mock_input):
-        create_file_and_write(u'Тест.txt')
+        self._media_create(u'Тест.txt')
 
-        expected_string = u'Remove {}'.format(get_media_path(u'Тест.txt'))
+        expected_string = u'Remove {}'.format(self._media_abs_path(u'Тест.txt'))
         if six.PY2:
             expected_string = expected_string.encode('utf-8')
 
@@ -70,4 +68,4 @@ class TestManagementCommand(BaseTestCase):
             .to_include(expected_string) \
             .to_include(u'Done. 1 unused files have been removed')
 
-        expect(exists_media_path(u'Тест.txt')).to_be_false()
+        expect(self._media_exists(u'Тест.txt')).to_be_false()

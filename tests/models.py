@@ -16,6 +16,7 @@ class FileFieldsModel(models.Model):
     image_field = models.ImageField(upload_to='test1_image')
     char_field = models.CharField(max_length=255)
 
+
 class CustomFileldsModel(models.Model):
     custom_field = CustomFiled(upload_to='sub/dir/test2', null=True, blank=True)
     char_field = models.CharField(max_length=255)
