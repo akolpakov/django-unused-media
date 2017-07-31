@@ -13,9 +13,6 @@ from .models import FileFieldsModel, CustomFileldsModel
 from .utils import create_file, create_image, create_file_and_write, exists_media_path, get_media_path
 
 
-_ver = sys.version_info
-
-
 class TestCleanup(BaseTestCase):
     def setUp(self):
         super(TestCleanup, self).setUp()

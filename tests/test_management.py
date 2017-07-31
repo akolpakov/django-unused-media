@@ -2,6 +2,7 @@
 
 import mock
 import sys
+import six
 
 from preggy import expect
 from django.core.management import call_command
@@ -9,9 +10,6 @@ from django.core.management import call_command
 from django_unused_media.management.commands.cleanup_unused_media import Command
 from .base import BaseTestCase
 from .utils import create_file_and_write, exists_media_path, get_media_path
-
-
-_ver = sys.version_info
 
 
 class TestManagementCommand(BaseTestCase):
@@ -22,7 +20,7 @@ class TestManagementCommand(BaseTestCase):
         cmd = Command()
         cmd.handle(interactive=False)
         expect(cmd.stdout.getvalue().split('\n'))\
-            .to_include('Nothing to delete. Exit')
+            .to_include(u'Nothing to delete. Exit')
 
     def test_command_not_interactive(self):
         create_file_and_write('file.txt')
@@ -30,8 +28,8 @@ class TestManagementCommand(BaseTestCase):
         cmd = Command()
         cmd.handle(interactive=False)
         expect(cmd.stdout.getvalue().split('\n'))\
-            .to_include('Remove {}'.format(get_media_path(u'file.txt')))\
-            .to_include('Done. 1 unused files have been removed')
+            .to_include(u'Remove {}'.format(get_media_path(u'file.txt')))\
+            .to_include(u'Done. 1 unused files have been removed')
 
         expect(exists_media_path('file.txt')).to_be_false()
 
@@ -42,7 +40,7 @@ class TestManagementCommand(BaseTestCase):
         cmd = Command()
         cmd.handle(interactive=True)
         expect(cmd.stdout.getvalue().split('\n'))\
-            .to_include('Interrupted by user. Exit.')
+            .to_include(u'Interrupted by user. Exit.')
 
         expect(exists_media_path(u'file.txt')).to_be_true()
 
@@ -53,8 +51,8 @@ class TestManagementCommand(BaseTestCase):
         cmd = Command()
         cmd.handle(interactive=True)
         expect(cmd.stdout.getvalue().split('\n')) \
-            .to_include('Remove {}'.format(get_media_path(u'file.txt'))) \
-            .to_include('Done. 1 unused files have been removed')
+            .to_include(u'Remove {}'.format(get_media_path(u'file.txt'))) \
+            .to_include(u'Done. 1 unused files have been removed')
 
         expect(exists_media_path(u'file.txt')).to_be_false()
 
@@ -62,10 +60,14 @@ class TestManagementCommand(BaseTestCase):
     def test_command_interactive_y_with_ascii(self, mock_input):
         create_file_and_write(u'Тест.txt')
 
+        expected_string = u'Remove {}'.format(get_media_path(u'Тест.txt'))
+        if six.PY2:
+            expected_string = expected_string.encode('utf-8')
+
         cmd = Command()
         cmd.handle(interactive=True)
-        expect(cmd.stdout.getvalue().split('\n'))\
-            .to_include('Remove {}'.format(get_media_path(u'Тест.txt').encode('utf-8'))) \
-            .to_include('Done. 1 unused files have been removed')
+        expect(cmd.stdout.getvalue().split('\n')) \
+            .to_include(expected_string) \
+            .to_include(u'Done. 1 unused files have been removed')
 
         expect(exists_media_path(u'Тест.txt')).to_be_false()
