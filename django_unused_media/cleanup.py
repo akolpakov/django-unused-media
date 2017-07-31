@@ -49,7 +49,7 @@ def get_used_media():
         }
 
         for obj in field.model.objects.exclude(**is_empty).exclude(**is_null):
-            media.append(os.path.relpath(getattr(obj, field.name).url))
+            media.append(getattr(obj, field.name).path)
 
     return media
 
@@ -66,15 +66,16 @@ def _get_all_media(exclude=None):
 
     for root, dirs, files in os.walk(six.text_type(settings.MEDIA_ROOT)):
         for name in files:
-            rel_path = os.path.relpath(os.path.join(root, name), settings.MEDIA_ROOT)
+            path = os.path.join(root, name)
+            relpath = os.path.relpath(path, settings.MEDIA_ROOT)
             in_exclude = False
             for e in exclude:
-                if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), rel_path):
+                if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), relpath):
                     in_exclude = True
                     break
 
             if not in_exclude:
-                media.append(rel_path)
+                media.append(path)
 
     return media
 

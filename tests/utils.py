@@ -17,11 +17,14 @@ def create_image(filename):
         image = create_file(filename, f.read())
     return image
 
+
 def get_media_path(filename):
     return os.path.join(settings.MEDIA_ROOT, filename)
 
+
 def exists_media_path(filename):
     return os.path.exists(get_media_path(filename))
+
 
 def create_file_and_write(filename, data=None):
     if not data:
