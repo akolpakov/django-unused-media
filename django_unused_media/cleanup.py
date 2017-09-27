@@ -42,12 +42,20 @@ def get_used_media():
     media = []
 
     for field in _get_file_fields():
+        is_null = {
+            '%s__isnull' % field.name: True,
+        }
+        is_empty = {
+            '%s' % field.name: '',
+        }
+
         storage = field.storage
-        for value in field.model.objects.values_list(field.name, flat=True):
-            # Ignore empty values
-            if value in EMPTY_VALUES:
-                continue
-            media.append(storage.path(value))
+
+        for value in field.model.objects\
+                .values_list(field.name, flat=True)\
+                .exclude(**is_empty).exclude(**is_null):
+            if value not in EMPTY_VALUES:
+                media.append(storage.path(value))
 
     return media
 
