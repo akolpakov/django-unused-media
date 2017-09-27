@@ -26,6 +26,12 @@ class Command(BaseCommand):
                             action='append',
                             default=[],
                             help='Exclude files by mask (only * is supported), can use multiple --exclude')
+        
+        parser.add_argument('--remove-empty-dirs',
+                            dest='remove_empty_dirs',
+                            action='store_false',
+                            default=False,
+                            help='Remove empty dirs after files cleanup')
 
     def handle(self, *args, **options):
 
@@ -52,6 +58,7 @@ class Command(BaseCommand):
             self.stdout.write('Remove %s' % f)
             os.remove(os.path.join(settings.MEDIA_ROOT, f))
 
-        remove_empty_dirs()
+        if options.get('remove_empty_dirs'):
+            remove_empty_dirs()
 
         self.stdout.write('Done. %s unused files have been removed' % len(unused_media))

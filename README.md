@@ -34,14 +34,14 @@ By default command is running in interactive mode. List of files which are going
 
 ### Options
 
-`--noinput`, `--no-input`
+#### `--noinput`, `--no-input`
 
 Non interactive mode. Command will remove files without any confirmation from user. Useful for scripts.
 ```
 ./manage.py cleanup_unused_media --noinput
 ```
 
-`-e`, `--exclude` 
+#### `-e`, `--exclude`
 
 To avoid operating on particular files you can use exclude option. 
 - *`*` as any symbol is supported.*
@@ -56,6 +56,10 @@ Also you can exclude entire folder or some files in that folder (path should be 
 ```
 ./manage.py cleanup_unused_media -e path/to/dir/* -e path/to/dir/my*.doc
 ```
+
+#### `--remove-empty-dirs`
+
+Buy default script keep empty dirs in media folder. But with this option empty directories will be removed after cleaning process automatically.
 
 
 # Tests

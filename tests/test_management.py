@@ -69,3 +69,21 @@ class TestManagementCommand(BaseTestCase):
             .to_include(u'Done. 1 unused files have been removed')
 
         expect(self._media_exists(u'Тест.txt')).to_be_false()
+
+    @mock.patch('django_unused_media.management.commands.cleanup_unused_media.remove_empty_dirs')
+    def test_command_do_not_remove_dirs(self, mock_remove_empty_dirs):
+        self._media_create(u'sub1/sub2/sub3/notused.txt')
+
+        cmd = Command()
+        cmd.handle(interactive=False)
+
+        mock_remove_empty_dirs.assert_not_called()
+
+    @mock.patch('django_unused_media.management.commands.cleanup_unused_media.remove_empty_dirs')
+    def test_command_remove_dirs(self, mock_remove_empty_dirs):
+        self._media_create(u'sub1/sub2/sub3/notused.txt')
+
+        cmd = Command()
+        cmd.handle(interactive=False, remove_empty_dirs=True)
+
+        mock_remove_empty_dirs.assert_called_once()
