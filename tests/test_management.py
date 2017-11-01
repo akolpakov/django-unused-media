@@ -6,7 +6,6 @@ import six
 from preggy import expect
 from django.core.management import call_command
 
-from django_unused_media.management.commands.cleanup_unused_media import Command
 from .base import BaseTestCase
 
 
@@ -15,17 +14,17 @@ class TestManagementCommand(BaseTestCase):
         expect(call_command('cleanup_unused_media', interactive=False)).Not.to_be_an_error()
 
     def test_command_nothing_to_delete(self):
-        cmd = Command()
-        cmd.handle(interactive=False)
-        expect(cmd.stdout.getvalue().split('\n'))\
+        stdout = six.StringIO()
+        call_command('cleanup_unused_media', interactive=False, stdout=stdout)
+        expect(stdout.getvalue().split('\n'))\
             .to_include(u'Nothing to delete. Exit')
 
     def test_command_not_interactive(self):
         self._media_create('file.txt')
 
-        cmd = Command()
-        cmd.handle(interactive=False)
-        expect(cmd.stdout.getvalue().split('\n'))\
+        stdout = six.StringIO()
+        call_command('cleanup_unused_media', interactive=False, stdout=stdout)
+        expect(stdout.getvalue().split('\n'))\
             .to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt')))\
             .to_include(u'Done. 1 unused files have been removed')
 
@@ -35,9 +34,9 @@ class TestManagementCommand(BaseTestCase):
     def test_command_interactive_n(self, mock_input):
         self._media_create(u'file.txt')
 
-        cmd = Command()
-        cmd.handle(interactive=True)
-        expect(cmd.stdout.getvalue().split('\n'))\
+        stdout = six.StringIO()
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout)
+        expect(stdout.getvalue().split('\n'))\
             .to_include(u'Interrupted by user. Exit.')
 
         expect(self._media_exists(u'file.txt')).to_be_true()
@@ -46,9 +45,9 @@ class TestManagementCommand(BaseTestCase):
     def test_command_interactive_y(self, mock_input):
         self._media_create(u'file.txt')
 
-        cmd = Command()
-        cmd.handle(interactive=True)
-        expect(cmd.stdout.getvalue().split('\n')) \
+        stdout = six.StringIO()
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout)
+        expect(stdout.getvalue().split('\n')) \
             .to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt'))) \
             .to_include(u'Done. 1 unused files have been removed')
 
@@ -62,9 +61,9 @@ class TestManagementCommand(BaseTestCase):
         if six.PY2:
             expected_string = expected_string.encode('utf-8')
 
-        cmd = Command()
-        cmd.handle(interactive=True)
-        expect(cmd.stdout.getvalue().split('\n')) \
+        stdout = six.StringIO()
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout)
+        expect(stdout.getvalue().split('\n')) \
             .to_include(expected_string) \
             .to_include(u'Done. 1 unused files have been removed')
 
@@ -74,8 +73,7 @@ class TestManagementCommand(BaseTestCase):
     def test_command_do_not_remove_dirs(self, mock_remove_empty_dirs):
         self._media_create(u'sub1/sub2/sub3/notused.txt')
 
-        cmd = Command()
-        cmd.handle(interactive=False)
+        call_command('cleanup_unused_media', interactive=False)
 
         mock_remove_empty_dirs.assert_not_called()
 
@@ -83,7 +81,6 @@ class TestManagementCommand(BaseTestCase):
     def test_command_remove_dirs(self, mock_remove_empty_dirs):
         self._media_create(u'sub1/sub2/sub3/notused.txt')
 
-        cmd = Command()
-        cmd.handle(interactive=False, remove_empty_dirs=True)
+        call_command('cleanup_unused_media', interactive=False, remove_empty_dirs=True)
 
         mock_remove_empty_dirs.assert_called_once()
