@@ -33,8 +33,14 @@ class Command(BaseCommand):
                             default=False,
                             help='Remove empty dirs after files cleanup')
 
-    def handle(self, *args, **options):
+        parser.add_argument('-n', '--dry-run',
+                            dest='dry_run',
+                            action='store_true',
+                            default=False,
+                            help='Do everything except modify the filesystem.')
 
+    def handle(self, *args, **options):
+        dry_run = options['dry_run']
         unused_media = get_unused_media(options.get('exclude') or [])
 
         if not unused_media:
@@ -55,10 +61,13 @@ class Command(BaseCommand):
                 return
 
         for f in unused_media:
-            self.stdout.write('Remove %s' % f)
-            os.remove(os.path.join(settings.MEDIA_ROOT, f))
+            if dry_run:
+                self.stdout.write('Pretending to remove %s' % f)
+            else:
+                self.stdout.write('Remove %s' % f)
+                os.remove(os.path.join(settings.MEDIA_ROOT, f))
 
-        if options.get('remove_empty_dirs'):
+        if not dry_run and options.get('remove_empty_dirs'):
             remove_empty_dirs()
 
         self.stdout.write('Done. %s unused files have been removed' % len(unused_media))

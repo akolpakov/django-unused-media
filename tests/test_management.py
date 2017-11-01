@@ -84,3 +84,14 @@ class TestManagementCommand(BaseTestCase):
         call_command('cleanup_unused_media', interactive=False, remove_empty_dirs=True)
 
         mock_remove_empty_dirs.assert_called_once()
+
+    def test_command_dry_run(self):
+        self._media_create('file.txt')
+
+        stdout = six.StringIO()
+        call_command('cleanup_unused_media', interactive=False, dry_run=True, stdout=stdout)
+        expect(stdout.getvalue().split('\n'))\
+            .to_include(u'Pretending to remove {}'.format(self._media_abs_path(u'file.txt')))\
+            .to_include(u'Done. 1 unused files have been removed')
+
+        expect(self._media_exists('file.txt')).to_be_true()
