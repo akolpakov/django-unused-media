@@ -33,6 +33,20 @@ class Command(BaseCommand):
                             default=False,
                             help='Remove empty dirs after files cleanup')
 
+        parser.add_argument('-n', '--dry-run',
+                            dest='dry_run',
+                            action='store_true',
+                            default=False,
+                            help='Dry run without any affect on your data')
+
+    def _show_files_to_delete(self, unused_media):
+        self.stdout.write('These files will be removed:')
+
+        for f in unused_media:
+            self.stdout.write(f)
+
+        self.stdout.write('Total {} unused files will be removed'.format(len(unused_media)))
+
     def handle(self, *args, **options):
 
         unused_media = get_unused_media(options.get('exclude') or [])
@@ -41,16 +55,18 @@ class Command(BaseCommand):
             self.stdout.write('Nothing to delete. Exit')
             return
 
-        if options.get('interactive'):
+        if options.get('dry_run'):
+            self._show_files_to_delete(unused_media)
+            self.stdout.write('Dry run. Exit.')
+            return
 
-            self.stdout.write('These files will be deleted:')
+        elif options.get('interactive'):
 
-            for f in unused_media:
-                self.stdout.write(f)
+            self._show_files_to_delete(unused_media)
 
             # ask user
 
-            if six.moves.input('Are you sure you want to remove %s unused files? (y/N)' % len(unused_media)).upper() != 'Y':
+            if six.moves.input('Are you sure you want to remove {} unused files? (y/N)'.format(len(unused_media))).upper() != 'Y':
                 self.stdout.write('Interrupted by user. Exit.')
                 return
 
@@ -61,4 +77,4 @@ class Command(BaseCommand):
         if options.get('remove_empty_dirs'):
             remove_empty_dirs()
 
-        self.stdout.write('Done. %s unused files have been removed' % len(unused_media))
+        self.stdout.write('Done. {} unused files have been removed'.format(len(unused_media)))
