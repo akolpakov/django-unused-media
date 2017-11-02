@@ -37,37 +37,44 @@ class Command(BaseCommand):
                             dest='dry_run',
                             action='store_true',
                             default=False,
-                            help='Do everything except modify the filesystem.')
+                            help='Dry run without any affect on your data')
+
+    def _show_files_to_delete(self, unused_media):
+        self.stdout.write('These files will be removed:')
+
+        for f in unused_media:
+            self.stdout.write(f)
+
+        self.stdout.write('Total {} unused files will be removed'.format(len(unused_media)))
 
     def handle(self, *args, **options):
-        dry_run = options['dry_run']
+
         unused_media = get_unused_media(options.get('exclude') or [])
 
         if not unused_media:
             self.stdout.write('Nothing to delete. Exit')
             return
 
-        if options.get('interactive'):
+        if options.get('dry_run'):
+            self._show_files_to_delete(unused_media)
+            self.stdout.write('Dry run. Exit.')
+            return
 
-            self.stdout.write('These files will be deleted:')
+        elif options.get('interactive'):
 
-            for f in unused_media:
-                self.stdout.write(f)
+            self._show_files_to_delete(unused_media)
 
             # ask user
 
-            if six.moves.input('Are you sure you want to remove %s unused files? (y/N)' % len(unused_media)).upper() != 'Y':
+            if six.moves.input('Are you sure you want to remove {} unused files? (y/N)'.format(len(unused_media))).upper() != 'Y':
                 self.stdout.write('Interrupted by user. Exit.')
                 return
 
         for f in unused_media:
-            if dry_run:
-                self.stdout.write('Pretending to remove %s' % f)
-            else:
-                self.stdout.write('Remove %s' % f)
-                os.remove(os.path.join(settings.MEDIA_ROOT, f))
+            self.stdout.write('Remove %s' % f)
+            os.remove(os.path.join(settings.MEDIA_ROOT, f))
 
-        if not dry_run and options.get('remove_empty_dirs'):
+        if options.get('remove_empty_dirs'):
             remove_empty_dirs()
 
-        self.stdout.write('Done. %s unused files have been removed' % len(unused_media))
+        self.stdout.write('Done. {} unused files have been removed'.format(len(unused_media)))

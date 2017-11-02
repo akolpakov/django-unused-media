@@ -61,6 +61,10 @@ Also you can exclude entire folder or some files in that folder (path should be 
 
 Buy default script keep empty dirs in media folder. But with this option empty directories will be removed after cleaning process automatically.
 
+#### `--dry-run`
+
+Dry run without any affect on your data
+
 
 # Tests
 At first make sure that you are in virtualenv.

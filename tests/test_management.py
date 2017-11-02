@@ -90,8 +90,9 @@ class TestManagementCommand(BaseTestCase):
 
         stdout = six.StringIO()
         call_command('cleanup_unused_media', interactive=False, dry_run=True, stdout=stdout)
-        expect(stdout.getvalue().split('\n'))\
-            .to_include(u'Pretending to remove {}'.format(self._media_abs_path(u'file.txt')))\
-            .to_include(u'Done. 1 unused files have been removed')
+        expect(stdout.getvalue().split('\n')) \
+            .to_include(self._media_abs_path(u'file.txt')) \
+            .to_include(u'Total 1 unused files will be removed') \
+            .to_include(u'Dry run. Exit.')
 
         expect(self._media_exists('file.txt')).to_be_true()
