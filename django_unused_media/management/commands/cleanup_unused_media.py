@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 import six.moves
-
 from django_unused_media.cleanup import get_unused_media, remove_empty_dirs
-
-import os
 
 
 class Command(BaseCommand):

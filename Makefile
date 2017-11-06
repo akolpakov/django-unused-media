@@ -37,5 +37,8 @@ tox:
 flake8:
 	@flake8 django_unused_media tests
 
+isort:
+	@isort -rc django_unused_media
+
 upload:
 	@python setup.py sdist upload

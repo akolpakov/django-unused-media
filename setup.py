@@ -28,6 +28,7 @@ tests_require = [
     'django_nose',
     'pypandoc',
     'flake8',
+    'isort'
 ]
 
 setup(

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from django.db import models
+import os
+import re
+
+import six
 from django.apps import apps
 from django.conf import settings
 from django.core.validators import EMPTY_VALUES
-
-import os
-import re
-import six
+from django.db import models
 
 
 def _get_file_fields():
