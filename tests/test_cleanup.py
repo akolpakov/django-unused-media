@@ -148,9 +148,18 @@ class TestCleanup(BaseTestCase):
         self._media_create(u'sub1/sub2/sub3/notused.txt')
         remove_unused_media()
         remove_empty_dirs()
+        expect(self._media_exists(u'sub1/sub2/sub3/notused.txt')).to_be_false()
         expect(self._media_exists(u'sub1/sub2/sub3')).to_be_false()
         expect(self._media_exists(u'sub1/sub2')).to_be_false()
         expect(self._media_exists(u'sub1')).to_be_false()
+
+    def test_remove_empty_dirs_not_empty(self):
+        self._media_create(u'sub1/sub2/sub3/notused.txt')
+        remove_empty_dirs()
+        expect(self._media_exists(u'sub1/sub2/sub3/notused.txt')).to_be_true()
+        expect(self._media_exists(u'sub1/sub2/sub3')).to_be_true()
+        expect(self._media_exists(u'sub1/sub2')).to_be_true()
+        expect(self._media_exists(u'sub1')).to_be_true()
 
     def test_ascii_filenames(self):
         self._media_create(u'Тест.txt')

@@ -104,8 +104,8 @@ def _remove_media(files):
     """
         Delete file from media dir
     """
-    for f in files:
-        os.remove(os.path.join(settings.MEDIA_ROOT, f))
+    for filename in files:
+        os.remove(os.path.join(settings.MEDIA_ROOT, filename))
 
 
 def remove_unused_media():
