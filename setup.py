@@ -27,6 +27,7 @@ tests_require = [
     'coveralls',
     'django_nose',
     'pypandoc',
+    'flake8',
 ]
 
 setup(

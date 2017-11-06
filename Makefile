@@ -33,5 +33,9 @@ test_no_coverage:
 tox:
 	@tox
 
+# run static analyser
+flake8:
+	@flake8 django_unused_media tests
+
 upload:
 	@python setup.py sdist upload
