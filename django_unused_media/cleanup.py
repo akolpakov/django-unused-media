@@ -51,8 +51,8 @@ def get_used_media():
 
         storage = field.storage
 
-        for value in field.model.objects\
-                .values_list(field.name, flat=True)\
+        for value in field.model.objects \
+                .values_list(field.name, flat=True) \
                 .exclude(**is_empty).exclude(**is_null):
             if value not in EMPTY_VALUES:
                 media.append(storage.path(value))
@@ -104,8 +104,8 @@ def _remove_media(files):
     """
         Delete file from media dir
     """
-    for file in files:
-        os.remove(os.path.join(settings.MEDIA_ROOT, file))
+    for f in files:
+        os.remove(os.path.join(settings.MEDIA_ROOT, f))
 
 
 def remove_unused_media():
@@ -115,15 +115,20 @@ def remove_unused_media():
     _remove_media(get_unused_media())
 
 
-def remove_empty_dirs(path=settings.MEDIA_ROOT):
+def remove_empty_dirs(path=None):
     """
         Recursively delete empty directories; return True if everything was deleted.
     """
 
+    if not path:
+        path = settings.MEDIA_ROOT
+
     if not os.path.isdir(path):
         return False
 
-    if all([remove_empty_dirs(os.path.join(path, filename)) for filename in os.listdir(path)]):
+    listdir = [os.path.join(path, filename) for filename in os.listdir(path)]
+
+    if all(map(remove_empty_dirs, listdir)):
         os.rmdir(path)
         return True
     else:

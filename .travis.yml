@@ -15,11 +15,10 @@ python:
     - "pypy"
 
 install:
-    # install python requirements
     - make setup
 
 script:
-    # run tests
+    - make flake8
     - make test
 
 addons:

@@ -26,7 +26,7 @@ class Command(BaseCommand):
                             action='append',
                             default=[],
                             help='Exclude files by mask (only * is supported), can use multiple --exclude')
-        
+
         parser.add_argument('--remove-empty-dirs',
                             dest='remove_empty_dirs',
                             action='store_false',
@@ -66,7 +66,9 @@ class Command(BaseCommand):
 
             # ask user
 
-            if six.moves.input('Are you sure you want to remove {} unused files? (y/N)'.format(len(unused_media))).upper() != 'Y':
+            question = 'Are you sure you want to remove {} unused files? (y/N)'.format(len(unused_media))
+
+            if six.moves.input(question).upper() != 'Y':
                 self.stdout.write('Interrupted by user. Exit.')
                 return
 

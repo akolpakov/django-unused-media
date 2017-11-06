@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
+from django_nose import NoseTestSuiteRunner
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
-
-from django_nose import NoseTestSuiteRunner
 
 
 if __name__ == '__main__':
