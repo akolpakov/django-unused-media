@@ -128,7 +128,7 @@ def remove_empty_dirs(path=None):
 
     listdir = [os.path.join(path, filename) for filename in os.listdir(path)]
 
-    if all(map(remove_empty_dirs, listdir)):
+    if all(list(map(remove_empty_dirs, listdir))):
         os.rmdir(path)
         return True
     else:
