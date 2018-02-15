@@ -94,10 +94,10 @@ def get_unused_media(exclude=None):
     if not exclude:
         exclude = []
 
-    all_media = _get_all_media(exclude)
-    used_media = get_used_media()
+    all_media = set(_get_all_media(exclude))
+    used_media = set(get_used_media())
 
-    return [x for x in all_media if x not in used_media]
+    return all_media - used_media
 
 
 def _remove_media(files):
