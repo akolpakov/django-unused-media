@@ -2,11 +2,12 @@
 
 import os
 
+import six.moves
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-import six.moves
-from django_unused_media.cleanup import get_unused_media, remove_empty_dirs
+from django_unused_media.cleanup import get_unused_media
+from django_unused_media.remove import remove_empty_dirs
 
 
 class Command(BaseCommand):

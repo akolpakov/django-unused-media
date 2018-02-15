@@ -5,8 +5,9 @@ import six
 from preggy import expect
 from django.db import models
 
-from django_unused_media.cleanup import _get_file_fields, _get_all_media, get_used_media, \
-    get_unused_media, _remove_media, remove_unused_media, remove_empty_dirs
+from django_unused_media.cleanup import get_file_fields, get_all_media, get_used_media, \
+    get_unused_media, remove_unused_media
+from django_unused_media.remove import remove_media, remove_empty_dirs
 from .base import BaseTestCase
 from .models import FileFieldsModel, CustomFileldsModel
 
@@ -37,7 +38,7 @@ class TestCleanup(BaseTestCase):
         )
 
     def test_get_file_fields(self):
-        file_fields = _get_file_fields()
+        file_fields = get_file_fields()
         expect(file_fields).to_be_instance_of(list).to_length(3)
 
         for f in file_fields:
@@ -60,8 +61,8 @@ class TestCleanup(BaseTestCase):
             .to_include(self.model2.image_field.path)\
             .to_include(self.model3.custom_field.path)
 
-    def test_get_all_media(self):
-        expect(_get_all_media())\
+    def testget_all_media(self):
+        expect(get_all_media())\
             .to_be_instance_of(list).to_length(5)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
@@ -69,9 +70,9 @@ class TestCleanup(BaseTestCase):
             .to_include(self.model2.image_field.path)\
             .to_include(self.model3.custom_field.path)
 
-    def test_get_all_media_with_additional(self):
+    def testget_all_media_with_additional(self):
         self._media_create(u'file.txt')
-        expect(_get_all_media())\
+        expect(get_all_media())\
             .to_be_instance_of(list).to_length(6)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
@@ -80,7 +81,7 @@ class TestCleanup(BaseTestCase):
             .to_include(self.model3.custom_field.path)\
             .to_include(self._media_abs_path(u'file.txt'))
 
-    def test_get_all_media_with_exclude(self):
+    def testget_all_media_with_exclude(self):
         self._media_create(u'file.txt')
         self._media_create(u'.file2.txt')
         self._media_create(u'test.txt')
@@ -88,7 +89,7 @@ class TestCleanup(BaseTestCase):
         self._media_create(u'one.png')
         self._media_create(u'two.png')
         self._media_create(u'three.png')
-        expect(_get_all_media(['.*', '*.png', 'test.txt']))\
+        expect(get_all_media(['.*', '*.png', 'test.txt']))\
             .to_be_instance_of(list).to_length(7)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
@@ -100,11 +101,11 @@ class TestCleanup(BaseTestCase):
             .Not.to_include(self._media_abs_path(u'test.txt'))\
             .to_include(self._media_abs_path(u'do_not_exclude/test.txt'))
 
-    def test_get_all_media_with_exclude_folder(self):
+    def testget_all_media_with_exclude_folder(self):
         self._media_create(u'exclude_dir/file1.txt')
         self._media_create(u'exclude_dir/file2.txt')
         self._media_create(u'file3.txt')
-        expect(_get_all_media(['exclude_dir/*']))\
+        expect(get_all_media(['exclude_dir/*']))\
             .to_be_instance_of(list).to_length(6)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
@@ -134,7 +135,7 @@ class TestCleanup(BaseTestCase):
         expect(self._media_exists(u'file.txt')).to_be_false()
         self._media_create(u'file.txt')
         expect(self._media_exists(u'file.txt')).to_be_true()
-        _remove_media([u'file.txt'])
+        remove_media([u'file.txt'])
         expect(self._media_exists(u'file.txt')).to_be_false()
 
     def test_remove_unused_media(self):

@@ -4,36 +4,11 @@ import os
 import re
 
 import six
-from django.apps import apps
 from django.conf import settings
 from django.core.validators import EMPTY_VALUES
-from django.db import models
 
-from .utils import append_if_not_exists
-
-
-def _get_file_fields():
-    """
-        Get all fields which are inherited from FileField
-    """
-
-    # get models. Compatibility with 1.6
-
-    if getattr(apps, 'get_models'):
-        all_models = apps.get_models()
-    else:
-        all_models = models.get_models()
-
-    # get fields
-
-    fields = []
-
-    for model in all_models:
-        for field in model._meta.get_fields():
-            if isinstance(field, models.FileField):
-                fields.append(field)
-
-    return fields
+from .remove import remove_media
+from .utils import append_if_not_exists, get_file_fields
 
 
 def get_used_media():
@@ -43,7 +18,7 @@ def get_used_media():
 
     media = []
 
-    for field in _get_file_fields():
+    for field in get_file_fields():
         is_null = {
             '%s__isnull' % field.name: True,
         }
@@ -62,7 +37,7 @@ def get_used_media():
     return media
 
 
-def _get_all_media(exclude=None):
+def get_all_media(exclude=None):
     """
         Get all media from MEDIA_ROOT
     """
@@ -96,42 +71,14 @@ def get_unused_media(exclude=None):
     if not exclude:
         exclude = []
 
-    all_media = _get_all_media(exclude)
+    all_media = get_all_media(exclude)
     used_media = get_used_media()
 
     return [x for x in all_media if x not in used_media]
-
-
-def _remove_media(files):
-    """
-        Delete file from media dir
-    """
-    for filename in files:
-        os.remove(os.path.join(settings.MEDIA_ROOT, filename))
 
 
 def remove_unused_media():
     """
         Remove unused media
     """
-    _remove_media(get_unused_media())
-
-
-def remove_empty_dirs(path=None):
-    """
-        Recursively delete empty directories; return True if everything was deleted.
-    """
-
-    if not path:
-        path = settings.MEDIA_ROOT
-
-    if not os.path.isdir(path):
-        return False
-
-    listdir = [os.path.join(path, filename) for filename in os.listdir(path)]
-
-    if all(list(map(remove_empty_dirs, listdir))):
-        os.rmdir(path)
-        return True
-    else:
-        return False
+    remove_media(get_unused_media())

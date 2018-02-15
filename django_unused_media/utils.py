@@ -1,4 +1,37 @@
+# -*- coding: utf-8 -*-
+
+from django.apps import apps
+from django.db import models
+
 
 def append_if_not_exists(lst, item):
+    """
+        Append to the list only if item does not exist yet
+    """
+
     if item not in lst:
         lst.append(item)
+
+
+def get_file_fields():
+    """
+        Get all fields which are inherited from FileField
+    """
+
+    # get models. Compatibility with 1.6
+
+    if getattr(apps, 'get_models'):
+        all_models = apps.get_models()
+    else:
+        all_models = models.get_models()
+
+    # get fields
+
+    fields = []
+
+    for model in all_models:
+        for field in model._meta.get_fields():
+            if isinstance(field, models.FileField):
+                fields.append(field)
+
+    return fields
