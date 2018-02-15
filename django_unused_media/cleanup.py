@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.validators import EMPTY_VALUES
 from django.db import models
 
+from .utils import append_if_not_exists
+
 
 def _get_file_fields():
     """
@@ -55,7 +57,7 @@ def get_used_media():
                 .values_list(field.name, flat=True) \
                 .exclude(**is_empty).exclude(**is_null):
             if value not in EMPTY_VALUES:
-                media.append(storage.path(value))
+                append_if_not_exists(media, storage.path(value))
 
     return media
 
@@ -81,7 +83,7 @@ def _get_all_media(exclude=None):
                     break
 
             if not in_exclude:
-                media.append(path)
+                append_if_not_exists(media, path)
 
     return media
 
@@ -94,10 +96,10 @@ def get_unused_media(exclude=None):
     if not exclude:
         exclude = []
 
-    all_media = set(_get_all_media(exclude))
-    used_media = set(get_used_media())
+    all_media = _get_all_media(exclude)
+    used_media = get_used_media()
 
-    return all_media - used_media
+    return [x for x in all_media if x not in used_media]
 
 
 def _remove_media(files):
