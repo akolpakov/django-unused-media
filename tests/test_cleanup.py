@@ -2,7 +2,6 @@
 
 import six
 import mock
-import os
 
 from preggy import expect
 from django.db import models
