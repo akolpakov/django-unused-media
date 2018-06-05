@@ -49,7 +49,7 @@ def get_all_media(exclude=None):
 
     for root, dirs, files in os.walk(six.text_type(settings.MEDIA_ROOT)):
         for name in files:
-            path = os.path.join(root, name)
+            path = os.path.abspath(os.path.join(root, name))
             relpath = os.path.relpath(path, settings.MEDIA_ROOT)
             in_exclude = False
             for e in exclude:

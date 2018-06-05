@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import six
+import mock
+import os
 
 from preggy import expect
 from django.db import models
@@ -10,6 +12,14 @@ from django_unused_media.cleanup import get_file_fields, get_all_media, get_used
 from django_unused_media.remove import remove_media, remove_empty_dirs
 from .base import BaseTestCase
 from .models import FileFieldsModel, CustomFileldsModel
+
+
+def win_os_walk(path):
+    yield 'C:/dir', None, [r'test\file.txt']      # Windows walk returns mixed slashes in list of files
+
+
+def win_os_abspath(path):
+    return path.replace('/', '\\')
 
 
 class TestCleanup(BaseTestCase):
@@ -61,7 +71,7 @@ class TestCleanup(BaseTestCase):
             .to_include(self.model2.image_field.path)\
             .to_include(self.model3.custom_field.path)
 
-    def testget_all_media(self):
+    def test_get_all_media(self):
         expect(get_all_media())\
             .to_be_instance_of(list).to_length(5)\
             .to_include(self.model1.file_field.path)\
@@ -70,7 +80,7 @@ class TestCleanup(BaseTestCase):
             .to_include(self.model2.image_field.path)\
             .to_include(self.model3.custom_field.path)
 
-    def testget_all_media_with_additional(self):
+    def test_get_all_media_with_additional(self):
         self._media_create(u'file.txt')
         expect(get_all_media())\
             .to_be_instance_of(list).to_length(6)\
@@ -81,7 +91,7 @@ class TestCleanup(BaseTestCase):
             .to_include(self.model3.custom_field.path)\
             .to_include(self._media_abs_path(u'file.txt'))
 
-    def testget_all_media_with_exclude(self):
+    def test_get_all_media_with_exclude(self):
         self._media_create(u'file.txt')
         self._media_create(u'.file2.txt')
         self._media_create(u'test.txt')
@@ -101,7 +111,7 @@ class TestCleanup(BaseTestCase):
             .Not.to_include(self._media_abs_path(u'test.txt'))\
             .to_include(self._media_abs_path(u'do_not_exclude/test.txt'))
 
-    def testget_all_media_with_exclude_folder(self):
+    def test_get_all_media_with_exclude_folder(self):
         self._media_create(u'exclude_dir/file1.txt')
         self._media_create(u'exclude_dir/file2.txt')
         self._media_create(u'file3.txt')
@@ -115,6 +125,13 @@ class TestCleanup(BaseTestCase):
             .to_include(self._media_abs_path(u'file3.txt'))\
             .Not.to_include(self._media_abs_path(u'exclude_dir/file1.txt'))\
             .Not.to_include(self._media_abs_path(u'exclude_dir/file2.txt'))
+
+    @mock.patch('django_unused_media.cleanup.os.path.abspath', side_effect=win_os_abspath)
+    @mock.patch('django_unused_media.cleanup.os.walk', side_effect=win_os_walk)
+    def test_get_all_media_win(self, mock_walk, mock_abspath):
+        expect(get_all_media())\
+               .to_be_instance_of(list).to_length(1)\
+               .to_include(r'C:\dir\test\file.txt')
 
     def test_get_unused_media_empty(self):
         expect(get_unused_media()).to_be_empty()
