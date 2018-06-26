@@ -40,44 +40,52 @@ class Command(BaseCommand):
                             default=False,
                             help='Dry run without any affect on your data')
 
-    def _show_files_to_delete(self, unused_media):
-        self.stdout.write('These files will be removed:')
+    def _show_files_to_delete(self, unused_media, verbosity):
+        if verbosity >= 2:
+            self.stdout.write('These files will be removed:')
 
         for f in unused_media:
             self.stdout.write(f)
 
-        self.stdout.write('Total {} unused files will be removed'.format(len(unused_media)))
+        if verbosity >= 1:
+            self.stdout.write('Total {} unused files will be removed'.format(len(unused_media)))
 
     def handle(self, *args, **options):
+        verbosity = options['verbosity']
 
         unused_media = get_unused_media(options.get('exclude') or [])
 
         if not unused_media:
-            self.stdout.write('Nothing to delete. Exit')
+            if verbosity >= 1:
+                self.stdout.write('Nothing to delete. Exit')
             return
 
         if options.get('dry_run'):
-            self._show_files_to_delete(unused_media)
-            self.stdout.write('Dry run. Exit.')
+            self._show_files_to_delete(unused_media, verbosity)
+            if verbosity >= 1:
+                self.stdout.write('Dry run. Exit.')
             return
 
         elif options.get('interactive'):
 
-            self._show_files_to_delete(unused_media)
+            self._show_files_to_delete(unused_media, verbosity)
 
             # ask user
 
             question = 'Are you sure you want to remove {} unused files? (y/N)'.format(len(unused_media))
 
             if six.moves.input(question).upper() != 'Y':
-                self.stdout.write('Interrupted by user. Exit.')
+                if verbosity >= 1:
+                    self.stdout.write('Interrupted by user. Exit.')
                 return
 
         for f in unused_media:
-            self.stdout.write('Remove %s' % f)
+            if verbosity >= 2:
+                self.stdout.write('Remove %s' % f)
             os.remove(os.path.join(settings.MEDIA_ROOT, f))
 
         if options.get('remove_empty_dirs'):
             remove_empty_dirs()
 
-        self.stdout.write('Done. {} unused files have been removed'.format(len(unused_media)))
+        if verbosity >= 1:
+            self.stdout.write('Done. {} unused files have been removed'.format(len(unused_media)))
