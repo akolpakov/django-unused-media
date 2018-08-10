@@ -59,7 +59,7 @@ Also you can exclude entire folder or some files in that folder (path should be 
 
 #### `--remove-empty-dirs`
 
-Buy default script keep empty dirs in media folder. But with this option empty directories will be removed after cleaning process automatically.
+By default script keep empty dirs in media folder. But with this option empty directories will be removed after cleaning process automatically.
 
 #### `--dry-run`
 
