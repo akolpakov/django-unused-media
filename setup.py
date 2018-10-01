@@ -28,12 +28,13 @@ tests_require = [
     'django_nose',
     'pypandoc',
     'flake8',
-    'isort'
+    'isort',
+    'twine'
 ]
 
 setup(
     name='django-unused-media',
-    version='0.1.12',
+    version='0.1.13',
     description='Delete unused media files from Django project',
     long_description=read_md('README.md'),
     keywords='python django unused media remove delete',
