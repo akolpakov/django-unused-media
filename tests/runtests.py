@@ -5,7 +5,7 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
 
-from django_nose import NoseTestSuiteRunner
+from django_nose import NoseTestSuiteRunner     # noqa: E731
 
 
 if __name__ == '__main__':
