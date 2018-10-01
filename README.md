@@ -65,6 +65,10 @@ By default script keep empty dirs in media folder. But with this option empty di
 
 Dry run without any affect on your data
 
+#### `--verbosity {0,1}`, `-v {0,1}`
+
+Verbosity level. 0 - minimal output, 1 - normal output (default)
+
 
 # Tests
 At first make sure that you are in virtualenv.
