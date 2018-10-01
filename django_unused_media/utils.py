@@ -18,12 +18,9 @@ def get_file_fields():
         Get all fields which are inherited from FileField
     """
 
-    # get models. Compatibility with 1.6
+    # get models
 
-    if getattr(apps, 'get_models'):
-        all_models = apps.get_models()
-    else:
-        all_models = models.get_models()
+    all_models = apps.get_models()
 
     # get fields
 
