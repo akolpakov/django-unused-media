@@ -4,15 +4,6 @@ from django.apps import apps
 from django.db import models
 
 
-def append_if_not_exists(lst, item):
-    """
-        Append to the list only if item does not exist yet
-    """
-
-    if item not in lst:
-        lst.append(item)
-
-
 def get_file_fields():
     """
         Get all fields which are inherited from FileField
