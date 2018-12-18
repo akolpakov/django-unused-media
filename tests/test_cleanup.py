@@ -63,7 +63,7 @@ class TestCleanup(BaseTestCase):
 
     def test_get_used_media(self):
         expect(get_used_media())\
-            .to_be_instance_of(list).to_length(5)\
+            .to_be_instance_of(set).to_length(5)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
             .to_include(self.model2.file_field.path)\
@@ -72,7 +72,7 @@ class TestCleanup(BaseTestCase):
 
     def test_get_all_media(self):
         expect(get_all_media())\
-            .to_be_instance_of(list).to_length(5)\
+            .to_be_instance_of(set).to_length(5)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
             .to_include(self.model2.file_field.path)\
@@ -82,7 +82,7 @@ class TestCleanup(BaseTestCase):
     def test_get_all_media_with_additional(self):
         self._media_create(u'file.txt')
         expect(get_all_media())\
-            .to_be_instance_of(list).to_length(6)\
+            .to_be_instance_of(set).to_length(6)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
             .to_include(self.model2.file_field.path)\
@@ -99,7 +99,7 @@ class TestCleanup(BaseTestCase):
         self._media_create(u'two.png')
         self._media_create(u'three.png')
         expect(get_all_media(['.*', '*.png', 'test.txt']))\
-            .to_be_instance_of(list).to_length(7)\
+            .to_be_instance_of(set).to_length(7)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
             .to_include(self.model2.file_field.path)\
@@ -115,7 +115,7 @@ class TestCleanup(BaseTestCase):
         self._media_create(u'exclude_dir/file2.txt')
         self._media_create(u'file3.txt')
         expect(get_all_media(['exclude_dir/*']))\
-            .to_be_instance_of(list).to_length(6)\
+            .to_be_instance_of(set).to_length(6)\
             .to_include(self.model1.file_field.path)\
             .to_include(self.model1.image_field.path)\
             .to_include(self.model2.file_field.path)\
@@ -129,7 +129,7 @@ class TestCleanup(BaseTestCase):
     @mock.patch('django_unused_media.cleanup.os.walk', side_effect=win_os_walk)
     def test_get_all_media_win(self, mock_walk, mock_abspath):
         expect(get_all_media())\
-               .to_be_instance_of(list).to_length(1)\
+               .to_be_instance_of(set).to_length(1)\
                .to_include(r'C:\dir\test\file.txt')
 
     def test_get_unused_media_empty(self):
@@ -138,14 +138,14 @@ class TestCleanup(BaseTestCase):
     def test_get_unused_media(self):
         self._media_create(u'notused.txt')
         used_media = get_unused_media()
-        expect(used_media).to_be_instance_of(list).to_length(1)
-        expect(used_media[0]).to_match(r'^.*notused.txt')
+        expect(used_media).to_be_instance_of(set).to_length(1)
+        expect(next(iter(used_media))).to_match(r'^.*notused.txt')
 
     def test_get_unused_media_subfolder(self):
         self._media_create(u'subfolder/notused.txt')
         used_media = get_unused_media()
-        expect(used_media).to_be_instance_of(list).to_length(1)
-        expect(used_media[0]).to_match(r'^.*subfolder/notused.txt$')
+        expect(used_media).to_be_instance_of(set).to_length(1)
+        expect(next(iter(used_media))).to_match(r'^.*subfolder/notused.txt$')
 
     def test_remove_media(self):
         expect(self._media_exists(u'file.txt')).to_be_false()
@@ -181,7 +181,7 @@ class TestCleanup(BaseTestCase):
     def test_ascii_filenames(self):
         self._media_create(u'Тест.txt')
         used_media = get_unused_media()
-        expect(used_media).to_be_instance_of(list).to_length(1)
+        expect(used_media).to_be_instance_of(set).to_length(1)
         expect(used_media[0]).to_be_instance_of(six.text_type)
         expect(used_media[0]).to_equal(self._media_abs_path(u'Тест.txt'))
 
@@ -190,5 +190,5 @@ class TestCleanup(BaseTestCase):
             file_field='./test_rel_path/file1.txt',
         )
         expect(get_used_media()) \
-            .to_be_instance_of(list)\
+            .to_be_instance_of(set)\
             .to_include(self._media_abs_path('test_rel_path/file1.txt'))
