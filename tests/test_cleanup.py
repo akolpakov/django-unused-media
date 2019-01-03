@@ -182,8 +182,8 @@ class TestCleanup(BaseTestCase):
         self._media_create(u'Тест.txt')
         used_media = get_unused_media()
         expect(used_media).to_be_instance_of(set).to_length(1)
-        expect(used_media[0]).to_be_instance_of(six.text_type)
-        expect(used_media[0]).to_equal(self._media_abs_path(u'Тест.txt'))
+        expect(next(iter(used_media))).to_be_instance_of(six.text_type)
+        expect(next(iter(used_media))).to_equal(self._media_abs_path(u'Тест.txt'))
 
     def test_relative_path(self):
         FileFieldsModel.objects.create(
