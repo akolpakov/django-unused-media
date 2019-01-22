@@ -28,7 +28,7 @@ def get_used_media():
 
         storage = field.storage
 
-        for value in field.model.objects \
+        for value in field.model._base_manager \
                 .values_list(field.name, flat=True) \
                 .exclude(**is_empty).exclude(**is_null):
             if value not in EMPTY_VALUES:
