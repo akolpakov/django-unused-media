@@ -13,7 +13,7 @@ This package provides management command `cleanup_unused_media` for Django appli
 
     Python 2.7, 3.6, 3.7 are tested with tox.
     
-    Django 1.8, 1.9, 1.10, 1.11, 2.0, 2.1 are tested with tox.
+    Django 1.8, 1.9, 1.10, 1.11, 2.0, 2.1, 2.2 are tested with tox.
 
 2.  Add ``django-unused-media`` to ``INSTALLED_APPS``:
     ```python
