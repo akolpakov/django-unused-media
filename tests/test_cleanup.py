@@ -10,7 +10,7 @@ from django_unused_media.cleanup import get_file_fields, get_all_media, get_used
     get_unused_media, remove_unused_media
 from django_unused_media.remove import remove_media, remove_empty_dirs
 from .base import BaseTestCase
-from .models import FileFieldsModel, CustomFileldsModel
+from .models import FileFieldsModel, CustomFileldsModel, CustomManagerModel
 
 
 def win_os_walk(path):
@@ -48,7 +48,7 @@ class TestCleanup(BaseTestCase):
 
     def test_get_file_fields(self):
         file_fields = get_file_fields()
-        expect(file_fields).to_be_instance_of(list).to_length(3)
+        expect(file_fields).to_be_instance_of(list).to_length(4)
 
         for f in file_fields:
             expect(f).to_be_instance_of(models.FileField)
@@ -60,6 +60,7 @@ class TestCleanup(BaseTestCase):
             .to_include('image_field')\
             .to_include('custom_field')
         expect(file_fields_names).Not.to_include('char_field')
+        expect(file_fields_names).Not.to_include('active')
 
     def test_get_used_media(self):
         expect(get_used_media())\
@@ -192,3 +193,18 @@ class TestCleanup(BaseTestCase):
         expect(get_used_media()) \
             .to_be_instance_of(set)\
             .to_include(self._media_abs_path('test_rel_path/file1.txt'))
+
+    def test_custom_manager(self):
+        model_active = CustomManagerModel.objects.create(
+            active=True,
+            file_field=self._create_file('file_custom_1.txt'),
+        )
+        model_not_active = CustomManagerModel.objects.create(
+            active=False,
+            file_field=self._create_file('file_custom_2.txt'),
+        )
+
+        expect(get_used_media()) \
+            .to_be_instance_of(set) \
+            .to_include(model_active.file_field.path) \
+            .to_include(model_not_active.file_field.path)

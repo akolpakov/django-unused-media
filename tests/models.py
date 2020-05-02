@@ -20,3 +20,15 @@ class FileFieldsModel(models.Model):
 class CustomFileldsModel(models.Model):
     custom_field = CustomFiled(upload_to='sub/dir/test2', null=True, blank=True)
     char_field = models.CharField(max_length=255)
+
+
+class CustomManager(models.Manager):
+    def get_queryset(self):
+        return super(CustomManager, self).get_queryset().filter(active=True)
+
+
+class CustomManagerModel(models.Model):
+    active = models.BooleanField(default=True)
+    file_field = models.FileField(upload_to='test3')
+
+    objects = CustomManager()
