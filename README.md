@@ -2,7 +2,9 @@
 
 [![build-status-image]][travis] [![PyPI][pypi-version-image]][pypi-version]
 
-This package provides management command `cleanup_unused_media` for Django applications. With help of this management command you can remove all media files which are no longer used (files without references from any Django model with `FileField` or `ImageField` fields or their inheritances).
+Package provides management command `cleanup_unused_media` for Django applications. 
+
+You can remove all not used media files (files without references from any Django model with `FileField` or `ImageField` fields or their inheritances).
 
 # Installation
 
@@ -30,13 +32,13 @@ To cleanup all unused media files, run management command:
 ```
 ./manage.py cleanup_unused_media
 ```
-By default command is running in interactive mode. List of files which are going to be removed will be displayed for confirmation. User have to confirm the action.
+By default command is running in interactive mode. List of files which are going to be removed will be displayed for confirmation. User has to confirm the action.
 
 ### Options
 
 #### `--noinput`, `--no-input`
 
-Non interactive mode. Command will remove files without any confirmation from user. Useful for scripts.
+Non interactive mode. Command will remove files without any confirmation from the user. Useful for scripts.
 ```
 ./manage.py cleanup_unused_media --noinput
 ```
@@ -59,7 +61,7 @@ Also you can exclude entire folder or some files in that folder (path should be 
 
 #### `--remove-empty-dirs`
 
-By default script keep empty dirs in media folder. But with this option empty directories will be removed after cleaning process automatically.
+By default script keeps empty dirs in media folder. But with this option all empty directories will be removed after cleaning process automatically.
 
 #### `--dry-run`
 
@@ -74,7 +76,7 @@ Verbosity level.
 
 
 # Tests
-At first make sure that you are in virtualenv.
+At first make sure that you are in virtualenv if you use it.
 
 Install all dependencies:
 ```
