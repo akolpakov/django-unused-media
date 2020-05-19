@@ -67,7 +67,10 @@ Dry run without any affect on your data
 
 #### `--verbosity {0,1,2}`, `-v {0,1,2}`
 
-Verbosity level. 0 - silent, 1 - normal output (default), 2 - verbose output (list individual files)
+Verbosity level. 
+- 0 - silent
+- 1 - normal output (default)
+- 2 - verbose output (list individual files)
 
 
 # Tests
