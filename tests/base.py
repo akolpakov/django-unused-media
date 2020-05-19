@@ -2,6 +2,8 @@
 
 import shutil
 import os
+import time
+
 from django.test import TestCase
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -39,7 +41,7 @@ class BaseTestCase(TestCase):
         return os.path.exists(cls._media_abs_path(filename))
 
     @classmethod
-    def _media_create(cls, filename, data=None):
+    def _media_create(cls, filename, data=None, file_age=None):
         if not data:
             data = 'test'
 
@@ -50,3 +52,7 @@ class BaseTestCase(TestCase):
 
         with open(filename, 'w') as f:
             f.write(data)
+
+        if file_age:
+            modification_time = time.time() - file_age
+            os.utime(filename, (modification_time, modification_time))

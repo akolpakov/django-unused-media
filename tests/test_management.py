@@ -11,11 +11,11 @@ from .base import BaseTestCase
 
 class TestManagementCommand(BaseTestCase):
     def test_command_call(self):
-        expect(call_command('cleanup_unused_media', interactive=False)).Not.to_be_an_error()
+        expect(call_command('cleanup_unused_media', interactive=False, minimum_file_age=0)).Not.to_be_an_error()
 
     def test_command_nothing_to_delete(self):
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=False, stdout=stdout)
+        call_command('cleanup_unused_media', interactive=False, stdout=stdout, minimum_file_age=0)
         expect(stdout.getvalue().split('\n'))\
             .to_include(u'Nothing to delete. Exit')
 
@@ -23,7 +23,7 @@ class TestManagementCommand(BaseTestCase):
         self._media_create('file.txt')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=False, stdout=stdout)
+        call_command('cleanup_unused_media', interactive=False, stdout=stdout, minimum_file_age=0)
         expect(stdout.getvalue().split('\n'))\
             .to_include(u'Done. Total files removed: 1')
 
@@ -34,7 +34,7 @@ class TestManagementCommand(BaseTestCase):
         self._media_create(u'file.txt')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=True, stdout=stdout)
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout, minimum_file_age=0)
         expect(stdout.getvalue().split('\n'))\
             .to_include(u'Interrupted by user. Exit.')
 
@@ -45,7 +45,7 @@ class TestManagementCommand(BaseTestCase):
         self._media_create(u'file.txt')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=True, stdout=stdout)
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout, minimum_file_age=0)
         expect(stdout.getvalue().split('\n')) \
             .to_include(u'Done. Total files removed: 1')
 
@@ -60,7 +60,7 @@ class TestManagementCommand(BaseTestCase):
             expected_string = expected_string.encode('utf-8')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=True, stdout=stdout, verbosity=2)
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout, verbosity=2, minimum_file_age=0)
         expect(stdout.getvalue().split('\n')) \
             .to_include(expected_string) \
             .to_include(u'Done. Total files removed: 1')
@@ -71,7 +71,7 @@ class TestManagementCommand(BaseTestCase):
     def test_command_do_not_remove_dirs(self, mock_remove_empty_dirs):
         self._media_create(u'sub1/sub2/sub3/notused.txt')
 
-        call_command('cleanup_unused_media', interactive=False)
+        call_command('cleanup_unused_media', interactive=False, minimum_file_age=0)
 
         mock_remove_empty_dirs.assert_not_called()
 
@@ -79,7 +79,7 @@ class TestManagementCommand(BaseTestCase):
     def test_command_remove_dirs(self, mock_remove_empty_dirs):
         self._media_create(u'sub1/sub2/sub3/notused.txt')
 
-        call_command('cleanup_unused_media', interactive=False, remove_empty_dirs=True)
+        call_command('cleanup_unused_media', interactive=False, remove_empty_dirs=True, minimum_file_age=0)
 
         mock_remove_empty_dirs.assert_called_once()
 
@@ -87,7 +87,7 @@ class TestManagementCommand(BaseTestCase):
         self._media_create('file.txt')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=False, dry_run=True, stdout=stdout)
+        call_command('cleanup_unused_media', interactive=False, dry_run=True, stdout=stdout, minimum_file_age=0)
         expect(stdout.getvalue().split('\n')) \
             .to_include(u'Total files will be removed: 1') \
             .to_include(u'Dry run. Exit.')
@@ -99,7 +99,7 @@ class TestManagementCommand(BaseTestCase):
         self._media_create(u'file.txt')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=True, stdout=stdout, verbosity=0)
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout, verbosity=0, minimum_file_age=0)
         expect(stdout.getvalue().split('\n')) \
             .Not.to_include(u'Files to remove:') \
             .Not.to_include(self._media_abs_path(u'file.txt')) \
@@ -112,6 +112,6 @@ class TestManagementCommand(BaseTestCase):
         self._media_create(u'file.txt')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=False, stdout=stdout, verbosity=0)
+        call_command('cleanup_unused_media', interactive=False, stdout=stdout, verbosity=0, minimum_file_age=0)
         expect(stdout.getvalue()).to_equal('')
         expect(self._media_exists(u'file.txt')).to_be_false()

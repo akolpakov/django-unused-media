@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.validators import EMPTY_VALUES
 
 from .remove import remove_media
-from .utils import get_file_fields
+from .utils import file_age_sec, get_file_fields
 
 
 def get_used_media():
@@ -37,7 +37,7 @@ def get_used_media():
     return media
 
 
-def get_all_media(exclude=None):
+def get_all_media(exclude=None, minimum_file_age=None):
     """
         Get all media from MEDIA_ROOT
     """
@@ -51,6 +51,14 @@ def get_all_media(exclude=None):
         for name in files:
             path = os.path.abspath(os.path.join(root, name))
             relpath = os.path.relpath(path, settings.MEDIA_ROOT)
+
+            print('!!!!!!!!!!!', minimum_file_age)
+            if minimum_file_age:
+                file_age = file_age_sec(path)
+                print('!!!!!!!!!!!2', file_age)
+                if file_age < minimum_file_age:
+                    continue
+
             for e in exclude:
                 if re.match(r'^%s$' % re.escape(e).replace('\\*', '.*'), relpath):
                     break
@@ -60,7 +68,7 @@ def get_all_media(exclude=None):
     return media
 
 
-def get_unused_media(exclude=None):
+def get_unused_media(exclude=None, minimum_file_age=None):
     """
         Get media which are not used in models
     """
@@ -68,7 +76,7 @@ def get_unused_media(exclude=None):
     if not exclude:
         exclude = []
 
-    all_media = get_all_media(exclude)
+    all_media = get_all_media(exclude, minimum_file_age)
     used_media = get_used_media()
 
     return all_media - used_media

@@ -35,6 +35,13 @@ class Command(BaseCommand):
                             default=[],
                             help='Exclude files by mask (only * is supported), can use multiple --exclude')
 
+        parser.add_argument('--minimum-file-age',
+                            dest='minimum_file_age',
+                            default=60,
+                            type=int,
+                            nargs=1,
+                            help='Skip files younger this age (sec)')
+
         parser.add_argument('--remove-empty-dirs',
                             dest='remove_empty_dirs',
                             action='store_false',
@@ -68,7 +75,10 @@ class Command(BaseCommand):
         if 'verbosity' in options:
             self.verbosity = options['verbosity']
 
-        unused_media = get_unused_media(options.get('exclude') or [])
+        unused_media = get_unused_media(
+            exclude=options.get('exclude'),
+            minimum_file_age=options.get('minimum_file_age'),
+        )
 
         if not unused_media:
             self.info('Nothing to delete. Exit')
