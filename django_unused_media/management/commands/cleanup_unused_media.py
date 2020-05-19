@@ -15,7 +15,7 @@ class Command(BaseCommand):
     help = "Clean unused media files which have no reference in models"
 
     # verbosity
-    # 0 means minimal output
+    # 0 means silent
     # 1 means normal output (default).
     # 2 means verbose output
 
@@ -48,11 +48,11 @@ class Command(BaseCommand):
                             help='Dry run without any affect on your data')
 
     def info(self, message):
-        if self.verbosity >= 0:
+        if self.verbosity > 0:
             self.stdout.write(message)
 
     def debug(self, message):
-        if self.verbosity >= 1:
+        if self.verbosity > 1:
             self.stdout.write(message)
 
     def _show_files_to_delete(self, unused_media):

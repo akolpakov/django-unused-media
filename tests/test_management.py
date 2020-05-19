@@ -25,7 +25,6 @@ class TestManagementCommand(BaseTestCase):
         stdout = six.StringIO()
         call_command('cleanup_unused_media', interactive=False, stdout=stdout)
         expect(stdout.getvalue().split('\n'))\
-            .to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt')))\
             .to_include(u'Done. Total files removed: 1')
 
         expect(self._media_exists('file.txt')).to_be_false()
@@ -48,7 +47,6 @@ class TestManagementCommand(BaseTestCase):
         stdout = six.StringIO()
         call_command('cleanup_unused_media', interactive=True, stdout=stdout)
         expect(stdout.getvalue().split('\n')) \
-            .to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt'))) \
             .to_include(u'Done. Total files removed: 1')
 
         expect(self._media_exists(u'file.txt')).to_be_false()
@@ -62,7 +60,7 @@ class TestManagementCommand(BaseTestCase):
             expected_string = expected_string.encode('utf-8')
 
         stdout = six.StringIO()
-        call_command('cleanup_unused_media', interactive=True, stdout=stdout)
+        call_command('cleanup_unused_media', interactive=True, stdout=stdout, verbosity=2)
         expect(stdout.getvalue().split('\n')) \
             .to_include(expected_string) \
             .to_include(u'Done. Total files removed: 1')
@@ -91,14 +89,13 @@ class TestManagementCommand(BaseTestCase):
         stdout = six.StringIO()
         call_command('cleanup_unused_media', interactive=False, dry_run=True, stdout=stdout)
         expect(stdout.getvalue().split('\n')) \
-            .to_include(self._media_abs_path(u'file.txt')) \
             .to_include(u'Total files will be removed: 1') \
             .to_include(u'Dry run. Exit.')
 
         expect(self._media_exists('file.txt')).to_be_true()
 
     @mock.patch('six.moves.input', return_value='Y')
-    def test_command_interactive_y_verbosity_0(self, mock_input):
+    def test_command_interactive_silent(self, mock_input):
         self._media_create(u'file.txt')
 
         stdout = six.StringIO()
@@ -106,7 +103,15 @@ class TestManagementCommand(BaseTestCase):
         expect(stdout.getvalue().split('\n')) \
             .Not.to_include(u'Files to remove:') \
             .Not.to_include(self._media_abs_path(u'file.txt')) \
-            .Not.to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt'))) \
-            .to_include(u'Done. Total files removed: 1')
+            .Not.to_include(u'Remove {}'.format(self._media_abs_path(u'file.txt')))
 
+        expect(self._media_exists(u'file.txt')).to_be_false()
+
+    @mock.patch('six.moves.input', return_value='Y')
+    def test_command_noninteractive_silent(self, mock_input):
+        self._media_create(u'file.txt')
+
+        stdout = six.StringIO()
+        call_command('cleanup_unused_media', interactive=False, stdout=stdout, verbosity=0)
+        expect(stdout.getvalue()).to_equal('')
         expect(self._media_exists(u'file.txt')).to_be_false()
