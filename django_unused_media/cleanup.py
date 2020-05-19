@@ -52,10 +52,8 @@ def get_all_media(exclude=None, minimum_file_age=None):
             path = os.path.abspath(os.path.join(root, name))
             relpath = os.path.relpath(path, settings.MEDIA_ROOT)
 
-            print('!!!!!!!!!!!', minimum_file_age)
             if minimum_file_age:
                 file_age = file_age_sec(path)
-                print('!!!!!!!!!!!2', file_age)
                 if file_age < minimum_file_age:
                     continue
 
