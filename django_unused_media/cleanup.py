@@ -2,13 +2,14 @@
 
 import os
 import re
+import time
 
 import six
 from django.conf import settings
 from django.core.validators import EMPTY_VALUES
 
 from .remove import remove_media
-from .utils import file_age_sec, get_file_fields
+from .utils import get_file_fields
 
 
 def get_used_media():
@@ -46,6 +47,7 @@ def get_all_media(exclude=None, minimum_file_age=None):
         exclude = []
 
     media = set()
+    initial_time = time.time()
 
     for root, dirs, files in os.walk(six.text_type(settings.MEDIA_ROOT)):
         for name in files:
@@ -53,7 +55,7 @@ def get_all_media(exclude=None, minimum_file_age=None):
             relpath = os.path.relpath(path, settings.MEDIA_ROOT)
 
             if minimum_file_age:
-                file_age = file_age_sec(path)
+                file_age = initial_time - os.path.getmtime(path)
                 if file_age < minimum_file_age:
                     continue
 
