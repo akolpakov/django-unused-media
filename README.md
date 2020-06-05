@@ -59,6 +59,12 @@ Also you can exclude entire folder or some files in that folder (path should be 
 ./manage.py cleanup_unused_media -e path/to/dir/* -e path/to/dir/my*.doc
 ```
 
+#### `--minimum-file-age`, seconds
+
+*Default = 60 (one minute)*
+
+Minimum file age to consider for cleanup. All files younger this age will be skipped. 
+
 #### `--remove-empty-dirs`
 
 By default script keeps empty dirs in media folder. But with this option all empty directories will be removed after cleaning process automatically.

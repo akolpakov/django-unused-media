@@ -126,6 +126,17 @@ class TestCleanup(BaseTestCase):
             .Not.to_include(self._media_abs_path(u'exclude_dir/file1.txt'))\
             .Not.to_include(self._media_abs_path(u'exclude_dir/file2.txt'))
 
+    def test_get_all_media_with_minimum_file_age(self):
+        self._media_create(u'fresh_file.txt')
+        expect(get_all_media(minimum_file_age=60)) \
+            .to_be_instance_of(set).to_length(0)
+
+    def test_get_all_media_with_minimum_file_age_2(self):
+        self._media_create(u'fresh_file.txt', file_age=70)
+        expect(get_all_media(minimum_file_age=60)) \
+            .to_be_instance_of(set).to_length(1) \
+            .to_include(self._media_abs_path(u'fresh_file.txt'))
+
     @mock.patch('django_unused_media.cleanup.os.path.abspath', side_effect=win_os_abspath)
     @mock.patch('django_unused_media.cleanup.os.walk', side_effect=win_os_walk)
     def test_get_all_media_win(self, mock_walk, mock_abspath):
