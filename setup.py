@@ -55,7 +55,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
     ],
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests', 'tests.*']),
     include_package_data=True,
     install_requires=[
         # add your dependencies here
