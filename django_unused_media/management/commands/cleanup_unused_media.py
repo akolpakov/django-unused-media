@@ -39,7 +39,6 @@ class Command(BaseCommand):
                             dest='minimum_file_age',
                             default=60,
                             type=int,
-                            nargs=1,
                             help='Skip files younger this age (sec)')
 
         parser.add_argument('--remove-empty-dirs',
