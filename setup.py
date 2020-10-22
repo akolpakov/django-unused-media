@@ -34,7 +34,7 @@ tests_require = [
 
 setup(
     name='django-unused-media',
-    version='0.2.1',
+    version='0.2.2',
     description='Delete unused media files from Django project',
     long_description=read_md('README.md'),
     keywords='python django unused media remove delete',
