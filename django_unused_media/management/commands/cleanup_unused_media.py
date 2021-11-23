@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
         parser.add_argument('--remove-empty-dirs',
                             dest='remove_empty_dirs',
-                            action='store_false',
+                            action='store_true',
                             default=False,
                             help='Remove empty dirs after files cleanup')
 
